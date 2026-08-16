@@ -36,10 +36,11 @@ jobs:
       - name: Tjek at alle sider findes
         run: test -f index.html && test -f progress.html
 
+      # Pages skal være slået til én gang under Settings → Pages med
+      # "Source: GitHub Actions". Workflowet kan ikke slå det til selv —
+      # GITHUB_TOKEN har ikke rettigheder til at oprette Pages-sitet.
       - name: Konfigurér Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Pak sitet
         uses: actions/upload-pages-artifact@v3
