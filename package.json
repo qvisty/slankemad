@@ -1,0 +1,11 @@
+{
+  "name": "slankemad",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Madplan, indkøbsliste og ernæringsmål til fedttab med styrketræning. Statisk site — ingen build.",
+  "scripts": {
+    "start": "node --version >/dev/null && python3 -m http.server 4173",
+    "check": "for f in assets/js/**/*.js; do node --check \"$f\"; done"
+  }
+}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Slankemad — udviklingsstatus</title>
+<meta name="description" content="Live status på udviklingen af Slankemad: komponenter, iterationer, kritik og næste skridt.">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="./assets/css/app.css">
+<style>
+  .status-side { max-width: 900px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 24px; }
+  .status-tabel { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .status-tabel th { text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); padding: 10px 12px; }
+  .status-tabel td { padding: 12px; border-top: 1px solid var(--hairline); vertical-align: top; }
+  .status-tabel tr td:first-child { font-weight: 650; white-space: nowrap; }
+  .prik { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-weight: 600; font-size: 13px; }
+  .prik::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+  .bestaaet { color: var(--accent); }
+  .igang { color: var(--kulhydrat); }
+  .venter { color: var(--text-faint); }
+  .rul { overflow-x: auto; }
+  .kritik { color: var(--text-muted); font-size: 13px; }
+  .tidslinje li { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 8px 0; border-top: 1px solid var(--hairline); font-size: 14px; }
+  .tidslinje li span:first-child { color: var(--text-faint); font-variant-numeric: tabular-nums; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="status-side">
+
+  <header style="display:grid;gap:6px">
+    <p class="label">Live udviklingsstatus</p>
+    <h1 style="font-size:28px;font-weight:700">Slankemad bygges for øjnene af dig</h1>
+    <p class="muted">Hver del bygges, kritiseres af en frisk kritiker uden kendskab til begrundelserne, og bygges om, indtil den holder. Siden her opdateres undervejs — den er ikke skrevet til sidst.</p>
+    <p class="finprint">Metoden er en tilpasning af <a href="https://github.com/robonuggets/gauntlet-loop/blob/main/.claude/skills/gauntlet-loop/SKILL.md">gauntlet-loop</a>: byg → blind kritik mod en konkret målestok → byg om, indtil kritikeren vælger vores.</p>
+    <p><a class="knap sek lille" href="./index.html">Åbn appen</a></p>
+  </header>
+
+  <section class="kort">
+    <h2 style="font-size:18px;margin-bottom:4px">Status lige nu</h2>
+    <p class="muted" style="font-size:14px">Runde 2 af den blinde kritik. Datalag, plangenerator, indkøbslogik og alle fem skærme er bygget og kører uden fejl i browseren. Målestokken er den researchede designspec fra Lifesum, Yazio, Mealime og Eat This Much.</p>
+  </section>
+
+  <section>
+    <h2 style="font-size:18px;margin-bottom:12px">Komponenter</h2>
+    <div class="kort rul">
+      <table class="status-tabel">
+        <thead>
+          <tr><th>Komponent</th><th>Status</th><th>Iteration</th><th>Seneste kritik</th><th>Hvad blev ændret</th><th>Næste skridt</th></tr>
+        </thead>
+        <tbody data-status>
+          <tr>
+            <td>Datamodel</td>
+            <td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Opdigtede kronepriser i varekataloget kunne ikke efterprøves.</td>
+            <td>Alle priser fjernet. Erstattet af prisklasse 1-3 til "billig"-mærkatet. Pakkestørrelser rettet mod verificeret REMA-varedata.</td>
+            <td>Ingen — låst.</td>
+          </tr>
+          <tr>
+            <td>Ernæringsberegning</td>
+            <td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Makroer skrevet i hånden pr. opskrift kan komme i utakt med ingredienslisten.</td>
+            <td>Al næring beregnes nu fra varekataloget. Mærkater (hurtig, proteinrig, træningsdag) beregnes også — de kan ikke lyve.</td>
+            <td>Ingen — låst.</td>
+          </tr>
+          <tr>
+            <td>Plangenerator</td>
+            <td><span class="prik igang">I gang</span></td><td>3</td>
+            <td class="kritik">Portionsfaktoren ramte loftet på 1,30× — planen kunne ikke nå et højt kaloriemål uden at oppuste portionerne.</td>
+            <td>Loft hævet til 1,45×, og teksten forklarer nu i stedet for at vise et råt tal. Råvaregenbrug vægtes i scoringen.</td>
+            <td>Ramme proteinmålet tættere på de dage, hvor det ligger 10-15 g under.</td>
+          </tr>
+          <tr>
+            <td>Indkøbsliste</td>
+            <td><span class="prik igang">I gang</span></td><td>2</td>
+            <td class="kritik">"ca. 5 pakker à 1 stk" på styksvarer er nonsens.</td>
+            <td>Pakke-hint vises kun for vægt- og volumenvarer med mere end én pakke.</td>
+            <td>Tjek at mængder for 1 person og for 6 personer også ser fornuftige ud.</td>
+          </tr>
+          <tr>
+            <td>Design og navigation</td>
+            <td><span class="prik igang">I gang</span></td><td>2</td>
+            <td class="kritik">Emoji-ikoner i bundnavigationen havde deres egne farver, så "aktiv" blev umulig at aflæse.</td>
+            <td>Erstattet af streg-ikoner i currentColor. Madbilledet beskæres nu korrekt i kortet.</td>
+            <td>Blind sammenligning mod målestokken på mobil.</td>
+          </tr>
+          <tr>
+            <td>Opskriftskort og -ark</td>
+            <td><span class="prik igang">I gang</span></td><td>1</td>
+            <td class="kritik">Endnu ikke kritiseret.</td>
+            <td>Bygget: genereret madillustration, mærkater, næring pr. portion, ingredienser skaleret til antal personer.</td>
+            <td>Kritik af informationshierarkiet i arket.</td>
+          </tr>
+          <tr>
+            <td>Mobiloplevelse</td>
+            <td><span class="prik igang">I gang</span></td><td>1</td>
+            <td class="kritik">Retternes titler brød over tre linjer på 390 px.</td>
+            <td>Titler klippes efter to linjer, billedkolonnen er låst til 96 px.</td>
+            <td>Test af tommelfinger-rækkevidde og trykflader i indkøbslisten.</td>
+          </tr>
+          <tr>
+            <td>GitHub Pages-deployment</td>
+            <td><span class="prik igang">I gang</span></td><td>1</td>
+            <td class="kritik">Ikke verificeret på den deployede version endnu.</td>
+            <td>Workflow bygget: syntakstjek af alle moduler, derefter deploy ved push til main.</td>
+            <td>Kør deployment og test den offentlige URL.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2 style="font-size:18px;margin-bottom:12px">Sådan er der arbejdet</h2>
+    <div class="kort">
+      <ul class="tidslinje">
+        <li><span>Research</span><span>To parallelle agenter: én på designmålestokken (Lifesum, Yazio, Mealime, Eat This Much), én på REMA 1000's faktiske sortiment og på om der findes en åben priskilde.</span></li>
+        <li><span>Beslutning</span><span>Ingen priser i appen. Der findes ingen offentlig, kontrollerbar priskilde — og gættede priser er værre end ingen priser.</span></li>
+        <li><span>Arkitektur</span><span>Data, kerne og visning adskilt i hver sin mappe, så varekataloget senere kan skiftes ud med et API uden at røre skærmene.</span></li>
+        <li><span>Test</span><span>Hele appen køres i en rigtig browser ved hver runde: konsolfejl, ernæringstal, indkøbsberegninger og skærmbilleder i mobil, mørk tilstand og desktop.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer class="finprint">
+    Siden opdateres manuelt undervejs i udviklingen og afspejler status ved seneste push til main.
+  </footer>
+</div>
+</body>
+</html>
