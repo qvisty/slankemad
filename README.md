@@ -17,7 +17,7 @@ kreatin — og uden at det føles som en kur.
 | | |
 |---|---|
 | **Madplan** | 3-7 dage med morgenmad, frokost, aftensmad og snacks. Byt en enkelt ret, lav en enkelt dag om, eller lav hele ugen om. Favoritter vægtes tungere næste gang. Planer kan gemmes og hentes frem igen. |
-| **Opskrifter** | 44 retter med ingredienser, mængder skaleret til antal personer, tilberedningstid, fremgangsmåde og fuld næring pr. portion. Mærkater som *hurtig*, *proteinrig*, *billig*, *god træningsdag* og *god hviledag* beregnes af koden — de kan ikke komme i utakt med tallene. |
+| **Opskrifter** | 55 retter med ingredienser, mængder skaleret til antal personer, tilberedningstid, fremgangsmåde og fuld næring pr. portion. Mærkater som *hurtig*, *proteinrig*, *billig*, *god træningsdag* og *god hviledag* beregnes af koden — de kan ikke komme i utakt med tallene. |
 | **Indkøbsliste** | Alle råvarer fra planen lagt sammen på tværs af retter og sorteret efter afdeling i butikken. Kan grupperes efter ret i stedet, krydses af undervejs, kopieres og printes. |
 | **Måltider du får serveret** | Får du morgenmad og frokost i kantinen eller ved en salatbar i hverdagen, så slå det til under Mig. Planen lægger så kun aftensmad og weekend ind, og de serverede måltider tæller stadig med i kalorier og makroer — men kommer aldrig på indkøbslisten. |
 | **Råvaregenbrug** | Generatoren belønner retter, der bruger råvarer, ugen allerede har åbnet, og straffer en ny fersk pakke, hvor halvdelen bliver til rest. Færre varer, mindre madspild. |
@@ -35,13 +35,15 @@ der brænder fedt netop på maven. Det, appen faktisk gør:
 - **Moderat underskud.** Basalstofskifte efter Mifflin-St Jeor, ganget med
   aktivitetsniveau, plus ca. 350 kcal pr. BodyPump-time. Underskuddet begrænses
   altid til højst 25 % af det samlede forbrug, og der advares, hvis tempoet
-  overstiger 0,9 % af kropsvægten om ugen.
-- **Højt protein.** 2,0 g pr. kg kropsvægt, fordelt over dagen. Det er den ene
-  faktor, der sammen med styrketræning afgør, om vægttabet kommer fra fedt eller
-  fra muskler.
+  overstiger 0,7 % af kropsvægten om ugen.
+- **Højt protein.** 2,0 g pr. kg målvægt, fordelt over dagen. Det regnes af
+  målvægten og ikke af den vægt du har nu, fordi fedtvæv ikke har et
+  proteinbehov. Protein er den ene faktor, der sammen med styrketræning afgør,
+  om vægttabet kommer fra fedt eller fra muskler.
 - **Fedtgulv.** Mindst 0,8 g pr. kg, resten som kulhydrat.
-- **Trænings- og hviledage.** Træningsdage får ~10 % flere kalorier, hviledage
-  tilsvarende færre. Ugegennemsnittet er uændret.
+- **Trænings- og hviledage.** Træningsdage får op til 250 kcal ekstra, hviledage
+  tilsvarende færre, og kulhydraterne bærer forskellen. Ugegennemsnittet er
+  uændret, og en hviledag kan aldrig falde under dit basalstofskifte.
 - **Buffet-måltider er skøn, ikke opskrifter.** Et kantinemåltid regnes ud fra en normal portion — skyr, salatbar, halv varm ret — og kan ikke skaleres frit, fordi du tager, hvad du tager. Tallene er gode nok til at få ugen til at hænge sammen, ikke til at måle med.
 - **Mæthed frem for moral.** Hvert måltid er bygget om en proteinkilde og en stor
   mængde grønt, fordi protein og fibre er det, der mætter pr. kalorie.
