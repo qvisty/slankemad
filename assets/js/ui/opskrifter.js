@@ -60,7 +60,9 @@ export function html() {
 
 function kort(o) {
   const m = makro(o);
-  const mk = maerkater(o)[0];
+  // "Hurtig" står allerede som minutter i metadata — en mærkat, der sidder på
+  // næsten alt, markerer ingenting.
+  const mk = maerkater(o).find(x => x.id !== 'hurtig');
   return `<div class="kort-omslag">
     <button class="opskriftskort" data-ret="${o.id}">
       <div class="billede">${madSvg(o, { b: 320, h: 220 })}</div>

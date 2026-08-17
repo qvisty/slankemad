@@ -16,7 +16,7 @@
 
 import { OPSKRIFTER } from '../data/opskrifter.js';
 import { VARER } from '../data/varer.js';
-import { OPSKRIFT_INDEX, makro, markorer, harFavoritVare, beregnMaal, dagMaal } from './ernaering.js';
+import { OPSKRIFT_INDEX, makro, markorer, harFavoritVare, beregnMaal, dagMaal, HURTIG_MINUTTER } from './ernaering.js';
 
 export const UGEDAGE = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'];
 
@@ -102,8 +102,11 @@ function score(valgte, slots, ctx, maalKcal) {
   if (kcal <= 0) return { straf: Infinity, faktorer: [] };
 
   let straf = (Math.abs(maalKcal - kcal) / maalKcal) * 140;             // kalorieafvigelse
-  straf += Math.max(0, ctx.proteinMaal - protein) * 1.4;                // for lidt protein er dyrt
-  straf += Math.max(0, protein - ctx.proteinMaal * 1.35) * 0.35;        // absurd meget protein er også skævt
+  // Protein er hele grunden til, at appen findes: det er den variabel, der
+  // afgør, om vægttabet kommer fra fedt eller fra muskler. Straffen er sat så
+  // højt, at hverken en favoritret eller lidt variation kan opveje en manko.
+  straf += Math.max(0, ctx.proteinMaal - protein) * 8;
+  straf += Math.max(0, protein - ctx.proteinMaal * 1.25) * 1.2;         // absurd meget protein er også skævt
   straf += faktorer.filter(f => f >= MAKS_FAKTOR).length * 6;           // portioner presset helt i top
   straf += tid / 10;                                                    // hurtigt vinder ved uafgjort
 
@@ -149,9 +152,21 @@ function raavareStraf(o, ctx) {
 /* ---------------- bygning ---------------- */
 
 function byggDag(ctx, dagNr, traener) {
-  const slots = slotsFor(ctx.valg);
+  const oenskede = slotsFor(ctx.valg);
+  // Er et måltid filtreret helt væk (fx både laktose og gluten fravalgt), så
+  // udelader vi slottet og siger det højt — i stedet for at bygge en plan på
+  // en tom pulje og vælte undervejs.
+  const mangler = [];
+  const slots = [];
+  const puljer = [];
+  for (const s of oenskede) {
+    const p = pulje(s, ctx.tilstand);
+    if (!p.length) { if (!mangler.includes(s)) mangler.push(s); continue; }
+    slots.push(s);
+    puljer.push(p);
+  }
+  if (!slots.length) return null;
   const vaegte = slotVaegte(slots);
-  const puljer = slots.map(s => pulje(s, ctx.tilstand));
   const maalKcal = dagMaal(ctx.maal, traener);
 
   const fleks = ctx.valg.fleksAften && dagNr === Number(ctx.valg.fleksDag) && slots.includes('aftensmad');
@@ -173,7 +188,6 @@ function byggDag(ctx, dagNr, traener) {
     const aktiveSlots = slots.filter(x => !(fleks && x === 'aftensmad'));
     const s = score(valgte, aktiveSlots, ctx, budgetTilRetter);
     if (!bedst || s.straf < bedst.s.straf) bedst = { s, valgte };
-    if (s.straf < -30) break;
   }
   if (!bedst) return null;
 
@@ -197,6 +211,7 @@ function byggDag(ctx, dagNr, traener) {
     navn: UGEDAGE[dagNr % 7],
     traener,
     maalKcal,
+    mangler,
     slots: dagSlots
   };
 }
@@ -369,19 +384,27 @@ export function ugensTal(plan) {
   if (!plan?.dage?.length) return null;
   const dage = plan.dage.map(dagensTal);
   const n = dage.length;
-  const sum = n => dage.reduce((a, d) => a + d[n], 0);
+  const sum = navn => dage.reduce((a, d) => a + d[navn], 0);
+
+  // Makroer regnes kun på de dage, hvor al mad er planlagt. En fri aften har et
+  // kaloriebudget, men vi ved ikke, hvad der bliver spist — at lade den tælle
+  // som nul protein ville få proteintallet til at lyve.
+  const fasteDage = plan.dage.map((d, i) => ({ d, t: dage[i] })).filter(x => !x.d.slots.some(s => s.fleks));
+  const m = navn => (fasteDage.length ? fasteDage.reduce((a, x) => a + x.t[navn], 0) / fasteDage.length : 0);
 
   const retter = plan.dage.flatMap(d => d.slots.filter(s => s.id).map(s => OPSKRIFT_INDEX[s.id]));
-  const hurtige = retter.filter(o => o.tid <= 20).length;
+  const hurtige = retter.filter(o => o.tid <= HURTIG_MINUTTER).length;
   const unikke = new Set(retter.map(o => o.id));
+  const mangler = [...new Set(plan.dage.flatMap(d => d.mangler || []))];
 
   return {
     dage: n,
     kcal: sum('kcal') / n,
-    protein: sum('p') / n,
-    kulhydrat: sum('k') / n,
-    fedt: sum('f') / n,
-    fiber: sum('fib') / n,
+    protein: m('p'),
+    kulhydrat: m('k'),
+    fedt: m('f'),
+    fiber: m('fib'),
+    makroDage: fasteDage.length,
     maaltider: retter.length,
     fleks: plan.dage.flatMap(d => d.slots).filter(s => s.fleks).length,
     tid: sum('tid'),
@@ -389,6 +412,10 @@ export function ugensTal(plan) {
     hurtige,
     langsomme: retter.length - hurtige,
     unikke: unikke.size,
+    mangler,
+    // Hvor tæt planen kommer på sit eget mål — bruges til at sige det højt,
+    // når de valgte måltider slet ikke kan rumme dagens kalorier.
+    daekning: dage.reduce((a, d, i) => a + d.kcal / Math.max(1, plan.dage[i].maalKcal), 0) / n,
     dagligeTal: dage
   };
 }

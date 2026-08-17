@@ -164,10 +164,11 @@ function maalBoks() {
         <span class="stat-note">${m.uger ? `ca. ${m.uger} uger til målet` : 'Sæt en målvægt'}</span>
       </div>
     </div>
-    ${m.procentPrUge > 0.9 ? `<p class="advarsel">Det tempo er over 0,9 % af din kropsvægt om ugen. Det går hurtigt — men risikoen for at tabe muskler stiger. Overvej et roligere tempo.</p>` : ''}
+    ${m.hurtigt ? `<p class="advarsel">Tempoet er over 0,7 % af din kropsvægt om ugen. Det går hurtigt — men risikoen for at tabe muskler stiger, og det er lige præcis det, træningen skal forhindre. Overvej et roligere tempo.</p>` : ''}
     ${m.begraenset ? `<p class="advarsel">Tempoet er automatisk skruet ned, så underskuddet holder sig under 25 % af dit forbrug.</p>` : ''}
     ${t.profil.maalvaegt >= t.profil.vaegt ? `<p class="advarsel">Din målvægt er ikke lavere end din nuværende vægt. Appen regner stadig et underskud ud, men den kan ikke sige, hvor lang tid der går.</p>` : ''}
-    <p class="finprint">Beregnet med Mifflin-St Jeor plus dit aktivitetsniveau og ${t.profil.traening} Bodypump-timer. Det er et kvalificeret estimat — justér efter, hvad vægten og taljen faktisk gør over 3-4 uger.</p>
+    <p class="finprint">Beregnet med Mifflin-St Jeor plus dit aktivitetsniveau og ${t.profil.traening} Bodypump-timer. Proteinmålet regnes af ${tal(m.proteinVaegt)} kg — din målvægt, ikke din nuværende vægt, fordi fedtvæv ikke har et proteinbehov.</p>
+    <p class="finprint">Tidshorisonten er en lige linje. I virkeligheden falder dit forbrug i takt med vægten, så regn med 15-25 % længere. Justér efter, hvad vægten og taljen faktisk gør over 3-4 uger.</p>
   </div>`;
 }
 

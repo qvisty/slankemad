@@ -38,7 +38,7 @@ export function visOpskrift(id, { portioner, faktor = 1 } = {}) {
   const d = sikrDialog();
   d.querySelector('.ark-indhold').innerHTML = `
     <button class="ark-luk" data-luk aria-label="Luk">✕</button>
-    <div class="ark-billede">${madSvg(o, { b: 400, h: 225 })}</div>
+    <div class="ark-billede">${madSvg(o, { b: 400, h: 168 })}</div>
     <div class="ark-krop">
       <div>
         <p class="label">${esc(kategoriNavn(o.kategori))} · ${minutter(o.tid)}</p>
@@ -50,13 +50,18 @@ export function visOpskrift(id, { portioner, faktor = 1 } = {}) {
         ${maerkater(o).map(x => `<span class="maerke ${x.id}" title="${esc(x.titel)}">${esc(x.navn)}</span>`).join('')}
       </div>
 
-      <div class="naering">
-        <div><b class="tal">${tal(m.kcal * faktor)}</b><span>kcal</span></div>
-        <div><b class="tal">${tal(m.p * faktor)}</b><span>protein</span></div>
-        <div><b class="tal">${tal(m.k * faktor)}</b><span>kulhydrat</span></div>
-        <div><b class="tal">${tal(m.f * faktor)}</b><span>fedt</span></div>
+      <div class="naering-blok">
+        <div class="naering-tal">
+          <b class="tal">${tal(m.kcal * faktor)}</b>
+          <span>kcal pr. portion</span>
+        </div>
+        <div class="makrobars">
+          ${makroLinje('Protein', m.p * faktor, 'var(--protein)')}
+          ${makroLinje('Kulhydrat', m.k * faktor, 'var(--kulhydrat)')}
+          ${makroLinje('Fedt', m.f * faktor, 'var(--fedt)')}
+        </div>
       </div>
-      <p class="finprint">Pr. portion · ${tal(m.fib * faktor, 1)} g fibre${faktor !== 1 ? ` · portionsstørrelse justeret ${tal(faktor, 2)}×, så dagen rammer dit mål` : ''}</p>
+      <p class="finprint">${tal(m.fib * faktor, 1)} g fibre pr. portion${faktor !== 1 ? ` · portionen er skaleret ${tal(faktor, 2)}×, så dagen rammer dit mål` : ''}</p>
 
       <div>
         <div class="blok-hoved"><h3 style="font-size:16px">Ingredienser</h3><span class="finprint">${pers} ${pers === 1 ? 'portion' : 'portioner'}</span></div>
@@ -101,6 +106,18 @@ export function visOpskrift(id, { portioner, faktor = 1 } = {}) {
 
   d.showModal();
   d.querySelector('.ark-indhold').scrollTop = 0;
+}
+
+/** Makroerne som bjælker, der kan sammenlignes — ikke fire lige store tal. */
+function makroLinje(navn, gram, farve) {
+  const kcal = gram * (navn === 'Fedt' ? 9 : 4);
+  return `<div class="makro">
+    <div class="makro-top">
+      <span class="makro-navn"><i class="makro-prik" style="background:${farve}"></i>${navn}</span>
+      <span class="makro-tal">${tal(gram)} g</span>
+    </div>
+    <div class="bar"><span style="width:${Math.min(100, (kcal / 900) * 100).toFixed(1)}%;background:${farve}"></span></div>
+  </div>`;
 }
 
 export const kategoriNavn = k =>

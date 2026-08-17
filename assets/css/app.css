@@ -14,8 +14,8 @@
   --surface-sunk: #f1f0e8;
   --surface-warm: #f6f1e6;
   --text: #22221f;
-  --text-muted: #6a6a62;
-  --text-faint: #9a998f;
+  --text-muted: #63625a;   /* 5,9:1 på --surface — al sekundær tekst */
+  --text-faint: #74736a;   /* 4,6:1 — labels og finprint, aldrig lysere */
   --hairline: #e7e5dc;
 
   /* Accent — handling og fremdrift */
@@ -53,6 +53,7 @@
   --e2: 0 2px 10px rgba(34, 34, 31, .06);
   --e3: 0 10px 30px rgba(34, 34, 31, .10);
 
+  --paa-accent: #ffffff;   /* skrift oven på accentfladen */
   --bund: 62px; /* højde på mobilnavigationen */
 }
 
@@ -65,8 +66,8 @@
     --surface-sunk: #262624;
     --surface-warm: #24221e;
     --text: #f2f1ec;
-    --text-muted: #a3a29a;
-    --text-faint: #74736c;
+    --text-muted: #adaca3;
+    --text-faint: #97968d;
     --hairline: #2e2e2b;
 
     --accent: #4ba97a;
@@ -85,6 +86,8 @@
     --fedt: #9085e9;
     --serie-1: #3987e5;
     --serie-2: #d95926;
+
+    --paa-accent: #10231a;   /* skrift oven på accentfladen */
 
     --e1: none;
     --e2: none;
@@ -142,10 +145,10 @@ section.blok { display: grid; gap: var(--s3); }
 .blok-hoved a, .blok-hoved button.link { font-size: 13px; font-weight: 600; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
 
 .label {
-  font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--text-faint);
+  font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text-faint); white-space: nowrap;
 }
-.finprint { font-size: 12.5px; color: var(--text-faint); line-height: 1.5; }
+.finprint { font-size: 12.5px; font-weight: 400; color: var(--text-faint); line-height: 1.5; }
 .muted { color: var(--text-muted); }
 .tal { font-variant-numeric: tabular-nums; }
 
@@ -165,7 +168,7 @@ section.blok { display: grid; gap: var(--s3); }
   display: inline-flex; align-items: center; justify-content: center; gap: var(--s2);
   min-height: 46px; padding: 0 var(--s5);
   border: 0; border-radius: var(--r-pill);
-  background: var(--accent); color: #fff;
+  background: var(--accent); color: var(--paa-accent);
   font-size: 15px; font-weight: 650; cursor: pointer;
   transition: transform .12s ease, background .15s ease;
 }
@@ -212,8 +215,8 @@ section.blok { display: grid; gap: var(--s3); }
 .stat .label { margin-bottom: 2px; }
 .stat-vaerdi { font-size: 24px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
 .stat-vaerdi small { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-left: 3px; letter-spacing: 0; }
-.stat-note { font-size: 12.5px; color: var(--text-faint); }
-.stat-note.god { color: var(--accent); }
+.stat-note { font-size: 12.5px; font-weight: 400; color: var(--text-muted); }
+.stat-note.god { color: #0ca30c; }   /* status, ikke brandfarve */
 .stat-note.over { color: var(--over); }
 
 /* ---------------- Dagsstribe ---------------- */
@@ -227,44 +230,56 @@ section.blok { display: grid; gap: var(--s3); }
 .dagsstribe::-webkit-scrollbar { display: none; }
 .dagsknap {
   flex: 0 0 auto; scroll-snap-align: center;
-  min-width: 52px; padding: var(--s2) var(--s3);
-  border: 0; border-radius: var(--r-md); background: var(--surface);
-  box-shadow: var(--e1); cursor: pointer;
-  display: grid; justify-items: center; gap: 2px;
+  min-width: 62px; padding: 8px 14px;
+  border: 0; border-radius: 16px; background: transparent;
+  cursor: pointer; display: grid; justify-items: center; gap: 1px;
 }
+.dagsknap:hover { background: var(--surface-sunk); }
 .dagsknap .d-navn { font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: var(--text-faint); }
 .dagsknap .d-kcal { font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; }
-.dagsknap .d-prik { width: 5px; height: 5px; border-radius: 50%; background: var(--varm); }
+.dagsknap .d-prik { width: 4px; height: 4px; border-radius: 50%; background: var(--text-faint); }
 .dagsknap[aria-selected="true"] { background: var(--accent); }
 .dagsknap[aria-selected="true"] .d-navn,
-.dagsknap[aria-selected="true"] .d-kcal { color: #fff; }
+.dagsknap[aria-selected="true"] .d-kcal { color: var(--paa-accent); }
 .dagsknap[aria-selected="true"] .d-prik { background: rgba(255, 255, 255, .8); }
 
 /* ---------------- Måltidskort ---------------- */
 .maaltider { display: grid; gap: var(--s3); }
 .maaltid {
+  position: relative;
   background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--e1);
-  overflow: hidden; display: grid; grid-template-columns: 96px 1fr; align-items: stretch;
+  overflow: hidden; display: grid; grid-template-columns: 92px 1fr; align-items: stretch;
   cursor: pointer; text-align: left; border: 0; padding: 0; width: 100%;
+  min-height: 92px;
   transition: transform .12s ease;
 }
 .maaltid:active { transform: scale(.995); }
-.maaltid .billede { background: var(--surface-sunk); width: 96px; height: 100%; min-height: 96px; overflow: hidden; }
+.maaltid .billede { background: var(--surface-sunk); width: 92px; aspect-ratio: 1; align-self: center; margin: 10px 0 10px 10px; border-radius: var(--r-md); overflow: hidden; }
 .maaltid .billede svg, .opskriftskort .billede svg, .ark-billede svg { display: block; width: 100%; height: 100%; }
-.maaltid .krop { padding: var(--s3) var(--s3) var(--s3) var(--s4); display: grid; gap: 3px; align-content: center; min-width: 0; }
+.maaltid .krop { padding: var(--s3) 44px var(--s3) var(--s4); display: grid; gap: 3px; align-content: center; min-width: 0; }
 .maaltid .slot { font-size: 11px; font-weight: 650; letter-spacing: .05em; text-transform: uppercase; color: var(--text-faint); }
 .maaltid h4 {
   font-size: 15.5px; font-weight: 650; line-height: 1.3;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.maaltid .meta { font-size: 12.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; display: flex; gap: 8px; flex-wrap: wrap; }
+.maaltid .meta { font-size: 12.5px; color: var(--text-muted); font-variant-numeric: tabular-nums; display: flex; flex-wrap: wrap; column-gap: 8px; row-gap: 0; }
+.maaltid .meta span + span::before { content: "·"; color: var(--text-faint); margin-right: 8px; }
 .maaltid .hjerte { color: var(--varm); }
 .maaltid.fleks { grid-template-columns: 1fr; background: var(--surface-warm); }
 .maaltid.fleks .krop { padding: var(--s4); }
 
-.slot-handling {
-  display: flex; gap: var(--s2); padding: 0 var(--s2) var(--s3) 100px; margin-top: -4px;
+.kort-handling {
+  position: absolute; top: 50%; right: 6px; transform: translateY(-50%);
+  display: grid; gap: 2px; z-index: 2;
 }
+.rund {
+  width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
+  background: transparent; color: var(--text-faint);
+  display: grid; place-items: center; font-size: 15px; line-height: 1;
+}
+.rund:hover { background: var(--surface-sunk); color: var(--text); }
+.rund.tekst-knap { width: auto; min-width: 34px; padding: 0 8px; border-radius: var(--r-pill); font-size: 11.5px; font-weight: 600; }
+.maaltid-rk { position: relative; }
 .mini {
   border: 0; background: none; color: var(--text-muted); cursor: pointer;
   font-size: 12.5px; font-weight: 600; padding: var(--s1) var(--s2); border-radius: var(--r-sm);
@@ -277,13 +292,13 @@ section.blok { display: grid; gap: var(--s3); }
   font-size: 11.5px; font-weight: 650; padding: 3px 8px; border-radius: var(--r-pill);
   background: var(--surface-sunk); color: var(--text-muted); white-space: nowrap;
 }
-.maerke.hurtig { background: var(--accent-soft); color: var(--accent-ink); }
-.maerke.protein { background: var(--varm-soft); color: var(--varm); }
+/* Mærkater bærer information, ikke opmærksomhed — de er altid neutrale.
+   Accentfarven er reserveret til handling og fremdrift. */
 .badge {
   font-size: 11px; font-weight: 650; padding: 2px 8px; border-radius: var(--r-pill);
   background: var(--surface-sunk); color: var(--text-muted);
 }
-.badge.traening { background: var(--accent-soft); color: var(--accent-ink); }
+.badge.traening { background: var(--surface-sunk); color: var(--text-muted); }
 
 /* ---------------- Opskriftsgitter ---------------- */
 .opskrift-gitter { display: grid; gap: var(--s3); grid-template-columns: repeat(2, 1fr); }
@@ -323,7 +338,7 @@ section.blok { display: grid; gap: var(--s3); }
   background: var(--surface); box-shadow: inset 0 0 0 1px var(--hairline);
   font-size: 13px; font-weight: 600; color: var(--text-muted);
 }
-.chip[aria-pressed="true"] { background: var(--accent); color: #fff; box-shadow: none; }
+.chip[aria-pressed="true"] { background: var(--accent); color: var(--paa-accent); box-shadow: none; }
 .sog {
   width: 100%; min-height: 44px; padding: 0 var(--s4);
   border: 0; border-radius: var(--r-pill); background: var(--surface-sunk);
@@ -333,24 +348,29 @@ section.blok { display: grid; gap: var(--s3); }
 
 /* ---------------- Indkøbsliste ---------------- */
 .gruppe { display: grid; gap: 0; }
+.gruppe {
+  background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--e1);
+  padding: var(--s2) var(--s4) var(--s3);
+}
 .gruppe > h3 {
-  position: sticky; top: 58px; z-index: 10;
-  font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase;
-  color: var(--text-faint); padding: var(--s4) 0 var(--s2);
-  background: linear-gradient(var(--bg) 70%, transparent);
+  font-size: 11px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase;
+  color: var(--text-faint); padding: var(--s3) 0 var(--s2);
 }
 .vare {
-  display: grid; grid-template-columns: 26px 68px 1fr; align-items: center; gap: var(--s3);
-  min-height: 52px; padding: var(--s2) var(--s3); cursor: pointer;
-  background: var(--surface); border-radius: var(--r-md); margin-bottom: 6px;
-  box-shadow: var(--e1);
+  display: grid; grid-template-columns: 24px 74px 1fr; align-items: center; gap: var(--s3);
+  height: 52px; cursor: pointer; border-top: 1px solid var(--hairline);
 }
+.vare:first-of-type { border-top: 0; }
 .vare input { width: 21px; height: 21px; accent-color: var(--accent); margin: 0; }
-.vare .m { font-variant-numeric: tabular-nums; font-weight: 650; font-size: 13.5px; color: var(--text-muted); text-align: right; }
-.vare .n { font-size: 14.5px; font-weight: 550; }
-.vare .n em { display: block; font-style: normal; font-size: 12px; color: var(--text-faint); }
+.vare .m { font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13.5px; color: var(--text-muted); }
+.vare .n { font-size: 14.5px; font-weight: 500; min-width: 0; }
+.vare .n span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vare .n em {
+  display: block; font-style: normal; font-size: 12px; font-weight: 400; color: var(--text-faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .vare.koebt { opacity: .45; }
-.vare.koebt .n { text-decoration: line-through; }
+.vare.koebt .n span { text-decoration: line-through; }
 
 /* ---------------- Formularer ---------------- */
 .felter { display: grid; gap: var(--s4); }
@@ -393,7 +413,7 @@ dialog.ark {
 }
 dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(2px); }
 .ark-indhold { overflow-y: auto; max-height: 92dvh; }
-.ark-billede { width: 100%; aspect-ratio: 16 / 9; background: var(--surface-sunk); }
+.ark-billede { width: 100%; aspect-ratio: 20 / 8.4; background: var(--surface-sunk); }
 .ark-krop { padding: var(--s5) var(--s4) var(--s10); display: grid; gap: var(--s4); }
 .ark-luk {
   position: absolute; top: var(--s3); right: var(--s3); z-index: 2;
@@ -401,14 +421,15 @@ dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(
   background: color-mix(in srgb, var(--surface) 88%, transparent);
   backdrop-filter: blur(6px); font-size: 17px; line-height: 1; display: grid; place-items: center;
 }
-.naering { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s2); text-align: center; }
-.naering div { background: var(--surface-sunk); border-radius: var(--r-md); padding: var(--s3) var(--s2); }
-.naering b { display: block; font-size: 17px; font-variant-numeric: tabular-nums; }
-.naering span { font-size: 11px; color: var(--text-muted); }
+.naering-blok { display: grid; gap: var(--s4); }
+.naering-tal { display: flex; align-items: baseline; gap: var(--s2); }
+.naering-tal b { font-size: 34px; font-weight: 700; letter-spacing: -.03em; line-height: 1; font-variant-numeric: tabular-nums; }
+.naering-tal span { font-size: 13px; color: var(--text-muted); font-weight: 500; }
 .ingredienser li {
   display: flex; justify-content: space-between; gap: var(--s4);
-  padding: 9px 0; border-bottom: 1px solid var(--hairline); font-size: 14.5px;
+  padding: 8px var(--s3); font-size: 14.5px; border-radius: var(--r-sm);
 }
+.ingredienser li:nth-child(odd) { background: var(--surface-sunk); }
 .ingredienser li span { color: var(--text-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .fremgang { display: grid; gap: var(--s3); counter-reset: trin; }
 .fremgang li {
@@ -464,12 +485,12 @@ dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(
   stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
 }
 .bundnav button[aria-selected="true"] .ikon { stroke-width: 2.1; }
-.bundnav .navn { font-size: 10.5px; font-weight: 650; letter-spacing: .02em; }
+.bundnav .navn { font-size: 10.5px; font-weight: 600; letter-spacing: .01em; }
 .bundnav button[aria-selected="true"] { color: var(--accent); }
 
 /* ---------------- Desktop ---------------- */
 @media (min-width: 900px) {
-  #toast { bottom: 28px !important; }
+  #toast { bottom: 24px !important; }
   .app { padding-bottom: var(--s8); display: grid; grid-template-columns: 232px 1fr; }
   .bundnav {
     position: sticky; top: 0; left: auto; right: auto; bottom: auto;
@@ -486,11 +507,12 @@ dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(
   .bundnav button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-ink); }
   .bundnav .navn { font-size: 14px; }
   .top { padding-top: var(--s6); }
-  .indhold, .top-inder { max-width: 720px; margin-inline: auto; }
+  .indhold, .top-inder { max-width: 860px; margin-inline: auto; }
   .top { justify-content: center; }
   .top-inder { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--s4); }
   .stats { grid-template-columns: repeat(4, 1fr); }
   .opskrift-gitter { grid-template-columns: repeat(3, 1fr); }
+  .indkobsgitter { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); align-items: start; }
   .gruppe > h3 { top: 0; }
   dialog.ark { margin: auto; border-radius: var(--r-xl); max-height: 88dvh; position: fixed; inset: 0; }
 }

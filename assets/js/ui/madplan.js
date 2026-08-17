@@ -3,7 +3,7 @@
  */
 
 import { hent, opdater, erFavorit, gemPlan } from '../core/state.js';
-import { makro, maerkater, OPSKRIFT_INDEX, beregnMaal } from '../core/ernaering.js';
+import { makro, OPSKRIFT_INDEX, beregnMaal } from '../core/ernaering.js';
 import { dagensTal, regenererDag, bytRet, skiftFleks, lavPlan, slotFaktor } from '../core/plan.js';
 import { madSvg } from './billede.js';
 import { visOpskrift, kategoriNavn } from './opskriftsark.js';
@@ -39,10 +39,12 @@ export function html() {
       return `<button class="dagsknap" role="tab" data-dag="${i}" aria-selected="${i === valgtDag}">
         <span class="d-navn">${x.navn.slice(0, 3)}</span>
         <span class="d-kcal tal">${tal(tt.kcal)}</span>
-        ${x.traener ? '<span class="d-prik" title="Bodypump"></span>' : '<span style="height:5px"></span>'}
+        ${x.traener ? '<span class="d-prik" title="Bodypump-dag"></span>' : '<span style="height:4px"></span>'}
       </button>`;
     }).join('')}
   </div>
+  <p class="finprint" style="margin:-8px 0 0">Prikken markerer dine Bodypump-dage.</p>
+  ${dag.mangler?.length ? `<p class="advarsel">Ingen retter tilbage til ${dag.mangler.join(' og ')} med dine fravalg — måltidet er sprunget over.</p>` : ''}
 
   <div class="kort" style="display:grid;gap:12px">
     <div class="dag-hoved">
@@ -111,21 +113,19 @@ function slotKort(s, dagIndex, slotIndex, dag) {
   if (!o) return '';
   const m = makro(o);
   const f = slotFaktor(s, dag);
-  const mk = maerkater(o).slice(0, 2);
   return `
-  <div>
+  <div class="maaltid-rk">
     <button class="maaltid" data-ret="${o.id}" data-faktor="${f}">
       <div class="billede">${madSvg(o, { b: 200, h: 200 })}</div>
       <div class="krop">
         <span class="slot">${kategoriNavn(s.slot)}${s.rester ? ' · rester fra i går' : ''}</span>
-        <h4>${esc(o.navn)} ${erFavorit(o.id) ? '<span class="hjerte">♥</span>' : ''}</h4>
-        <p class="meta"><span class="tal">${tal(m.kcal * f)} kcal</span><span class="tal">${tal(m.p * f)} g protein</span><span>${o.tid} min</span>${f >= 1.25 ? '<span title="Tag en større portion end opskriften">stor portion</span>' : ''}</p>
-        ${mk.length ? `<div class="maerkater" style="margin-top:4px">${mk.map(x => `<span class="maerke ${x.id}">${esc(x.navn)}</span>`).join('')}</div>` : ''}
+        <h4>${esc(o.navn)}${erFavorit(o.id) ? ' <span class="hjerte">♥</span>' : ''}</h4>
+        <p class="meta"><span class="tal">${tal(m.kcal * f)} kcal</span><span class="tal">${tal(m.p * f)} g protein</span><span>${o.tid} min</span></p>
       </div>
     </button>
-    <div class="slot-handling">
-      <button class="mini" data-byt="${dagIndex}:${slotIndex}">↻ Byt ret</button>
-      ${s.slot === 'aftensmad' ? `<button class="mini" data-fleks="${dagIndex}:${slotIndex}">Spis ude</button>` : ''}
+    <div class="kort-handling">
+      <button class="rund" data-byt="${dagIndex}:${slotIndex}" title="Byt til en anden ret" aria-label="Byt ${esc(o.navn)} ud">↻</button>
+      ${s.slot === 'aftensmad' ? `<button class="rund tekst-knap" data-fleks="${dagIndex}:${slotIndex}" title="Gør aftenen fri — spis ude" aria-label="Gør aftenen fri">ude</button>` : ''}
     </div>
   </div>`;
 }

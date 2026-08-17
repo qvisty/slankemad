@@ -29,7 +29,7 @@ export function makro(o) {
     sum.k += v.k * faktor;
     sum.f += v.f * faktor;
     sum.fib += (v.fib || 0) * faktor;
-    sum.pris += (v.pris || 2) * faktor * (v.enh === 'stk' ? 1 : 1);
+    sum.pris += (v.pris || 2) * faktor;   // prisklasse × mængde — kun til sammenligning
   }
   const pr = {};
   for (const n of ['kcal', 'p', 'k', 'f', 'fib', 'pris']) pr[n] = sum[n] / o.basis;
@@ -52,6 +52,9 @@ export function markorer(o) {
 export const harFavoritVare = o =>
   (typeof o === 'string' ? OPSKRIFT_INDEX[o] : o).ing.some(([n]) => FAVORIT_VARER.includes(n));
 
+/** Grænsen for "hurtig" — bruges både på mærkater og i ugens nøgletal. */
+export const HURTIG_MINUTTER = 20;
+
 /**
  * Mærkater, der er værd at vise på et opskriftskort.
  * De beregnes — de står ikke i data — så de aldrig kan komme i utakt med tallene.
@@ -63,10 +66,10 @@ export function maerkater(o) {
   const proteinAndel = (m.p * 4) / Math.max(1, m.kcal);
   const kulhydratAndel = (m.k * 4) / Math.max(1, m.kcal);
 
-  if (o.tid <= 15) ud.push({ id: 'hurtig', navn: 'Hurtig', titel: `Klar på ${o.tid} min` });
+  if (o.tid <= HURTIG_MINUTTER) ud.push({ id: 'hurtig', navn: 'Hurtig', titel: `Klar på ${o.tid} min` });
   if (proteinAndel >= 0.30 || m.p >= 35) ud.push({ id: 'protein', navn: 'Proteinrig', titel: `${Math.round(m.p)} g protein pr. portion` });
   if (m.fib >= 8) ud.push({ id: 'fiber', navn: 'Fiberrig', titel: `${Math.round(m.fib)} g fibre pr. portion` });
-  if (m.pris <= 45) ud.push({ id: 'billig', navn: 'Billig', titel: 'Bygget på basisvarer' });
+  if (m.pris <= 3.2) ud.push({ id: 'billig', navn: 'Billig', titel: 'Bygget på basisvarer' });
   if (kulhydratAndel >= 0.38 && m.k >= 45) ud.push({ id: 'traening', navn: 'God træningsdag', titel: `${Math.round(m.k)} g kulhydrat — brændstof til Bodypump` });
   else if (kulhydratAndel <= 0.28 && proteinAndel >= 0.28) ud.push({ id: 'hvile', navn: 'God hviledag', titel: 'Højt protein, færre kulhydrater' });
   if (o.tags?.includes('meal-prep') || o.tags?.includes('batch')) ud.push({ id: 'prep', navn: 'Meal-prep', titel: 'Holder sig og kan laves i forvejen' });
@@ -79,6 +82,9 @@ export function maerkater(o) {
 
 /** Kalorier brændt pr. Bodypump-time — konservativt sat. */
 const KCAL_PR_TRAENING = 350;
+
+/** Tempo, der begynder at koste muskelmasse — samme tal som i guiden. */
+export const HURTIGT_TEMPO_PCT = 0.7;
 
 export function beregnMaal(p) {
   const bmr = p.koen === 'kvinde'
@@ -93,28 +99,57 @@ export function beregnMaal(p) {
   const underskud = Math.min(oensket, maks);
   const kcal = Math.max(Math.round(tdee - underskud), Math.round(bmr * 1.05));
 
-  const protein = Math.round(2.0 * p.vaegt);      // 2,0 g/kg — muskelbevarelse
-  const fedt = Math.round(0.8 * p.vaegt);         // gulv for hormoner og mæthed
+  // Protein regnes af målvægten, ikke af den vægt du har nu: fedtvæv har ikke
+  // et proteinbehov, og 2 g pr. kg nuværende vægt låser unødigt mange kalorier,
+  // der er bedre brugt på kulhydrat til træningen.
+  const proteinVaegt = p.maalvaegt && p.maalvaegt < p.vaegt
+    ? Math.max(p.maalvaegt, p.vaegt * 0.8)
+    : p.vaegt;
+  const protein = Math.round(2.0 * proteinVaegt);
+  const fedt = Math.round(0.8 * proteinVaegt);    // gulv for hormoner og mæthed
   const kulhydrat = Math.max(60, Math.round((kcal - protein * 4 - fedt * 9) / 4));
   const fiber = Math.max(30, Math.round(kcal / 1000 * 14));
 
-  const d = Math.max(1, Math.min(6, p.traening));
-  const traeningsdag = Math.round(kcal * 1.10);
-  const hviledag = Math.round(kcal - (traeningsdag - kcal) * d / (7 - d));
+  // Trænings- og hviledage: samme ugegennemsnit, men kalorierne flyttes hen,
+  // hvor de bliver brugt. Forskellen skrues ned, hvis en hviledag ellers ville
+  // falde under et fornuftigt gulv — det var før muligt at få 900 kcal på en
+  // hviledag ved seks ugentlige træningsdage.
+  const d = Math.max(0, Math.min(6, Number(p.traening) || 0));
+  const hviledage = 7 - d;
+  const gulv = Math.max(Math.round(bmr), 1500);
+  let traeningsdag = kcal;
+  let hviledag = kcal;
+  if (d > 0 && hviledage > 0) {
+    let delta = Math.min(kcal * 0.10, 250);
+    if (kcal - (delta * d) / hviledage < gulv) {
+      delta = Math.max(0, ((kcal - gulv) * hviledage) / d);
+    }
+    traeningsdag = Math.round(kcal + delta);
+    hviledag = Math.round(kcal - (delta * d) / hviledage);
+  }
+
+  // Protein og fedt er faste; kulhydraterne bærer forskellen mellem dagene.
+  const kulhydratTraening = Math.max(40, Math.round((traeningsdag - protein * 4 - fedt * 9) / 4));
+  const kulhydratHvile = Math.max(40, Math.round((hviledag - protein * 4 - fedt * 9) / 4));
 
   const faktisk = tdee - kcal;
   const ugetab = (faktisk * 7) / 7700;
   const kgTilbage = Math.max(0, p.vaegt - p.maalvaegt);
+  const procentPrUge = (ugetab / p.vaegt) * 100;
 
   return {
     bmr: Math.round(bmr),
     tdee: Math.round(tdee),
     kcal, protein, fedt, kulhydrat, fiber,
-    traeningsdag, hviledag,
+    proteinVaegt: Math.round(proteinVaegt),
+    traeningsdag, hviledag, kulhydratTraening, kulhydratHvile,
     underskud: Math.round(faktisk),
     ugetab,
+    // Lineær fremskrivning. Stofskiftet falder med vægten, så det reelle
+    // forløb er 15-25 % længere — det står der i teksten ved siden af.
     uger: faktisk > 0 && kgTilbage > 0 ? Math.ceil((kgTilbage * 7700) / (faktisk * 7)) : null,
-    procentPrUge: (ugetab / p.vaegt) * 100,
+    procentPrUge,
+    hurtigt: procentPrUge > HURTIGT_TEMPO_PCT,
     begraenset: oensket > maks
   };
 }

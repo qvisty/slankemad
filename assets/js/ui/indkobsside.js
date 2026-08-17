@@ -42,24 +42,25 @@ export function html() {
     </div>
   </div>
 
+  <div class="indkobsgitter">
   ${liste.grupper.map(g => `
     <section class="gruppe">
-      <h3>${g.emoji} ${esc(g.navn)}</h3>
+      <h3>${esc(g.navn)}</h3>
       ${g.varer.map(l => `
-        <label class="vare ${t.koeb[l.noegle] ? 'koebt' : ''}">
+        <label class="vare ${t.koeb[l.noegle] ? 'koebt' : ''}"${l.alt ? ` title="${esc(l.alt)}"` : ''}>
           <input type="checkbox" data-vare="${esc(l.noegle)}" ${t.koeb[l.noegle] ? 'checked' : ''}>
           <span class="m">${esc(maengdeTekst(l))}</span>
-          <span class="n">${esc(l.navn)}
-            ${l.enh !== 'stk' && l.pakker > 1 ? `<em>ca. ${l.pakker} pakker à ${esc(maengdeTekst({ enh: l.enh, maengde: l.pakke }))}</em>` : ''}
-            ${l.alt ? `<em>${esc(l.alt)}</em>` : ''}
+          <span class="n"><span>${esc(l.navn)}</span>
+            ${l.enh !== 'stk' && l.pakker > 1 ? `<em>ca. ${l.pakker} pk. à ${esc(maengdeTekst({ enh: l.enh, maengde: l.pakke }))}</em>` : (l.alt ? `<em>${esc(l.alt)}</em>` : '')}
           </span>
         </label>`).join('')}
     </section>`).join('')}
+  </div>
 
   ${liste.fast.length ? `
     <section class="gruppe">
-      <h3>🧂 Tjek skabet</h3>
-      <div class="kort">
+      <h3>Tjek skabet</h3>
+      <div>
         <p class="finprint" style="margin-bottom:8px">Krydderier, olie og saucer, planen bruger lidt af. De står ikke på listen — slå dem til under Mig, hvis du vil købe dem med.</p>
         <div class="maerkater">${liste.fast.map(l => `<span class="maerke">${esc(l.navn)}</span>`).join('')}</div>
       </div>

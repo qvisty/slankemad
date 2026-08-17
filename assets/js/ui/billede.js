@@ -84,7 +84,6 @@ function tegnBid(x, y, farve, form, s, drej) {
 export function madSvg(o, { b = 400, h = 280 } = {}) {
   const rnd = fro(o.id);
   const raa = hovedraavarer(o);
-  const hoved = raa[0]?.v?.farve || '#d9b579';
 
   const cx = b / 2;
   const cy = h * 0.54;
@@ -122,9 +121,9 @@ export function madSvg(o, { b = 400, h = 280 } = {}) {
 
   return `<svg viewBox="0 0 ${b} ${h}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Illustration af ${o.navn}" preserveAspectRatio="xMidYMid slice">
   <defs>
-    <linearGradient id="bg-${o.id}" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0" stop-color="${hoved}" stop-opacity="0.20"/>
-      <stop offset="1" stop-color="${hoved}" stop-opacity="0.42"/>
+    <linearGradient id="bg-${o.id}" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#f2ece0"/>
+      <stop offset="1" stop-color="#e6dccb"/>
     </linearGradient>
     <radialGradient id="tal-${o.id}" cx="0.38" cy="0.32" r="0.8">
       <stop offset="0" stop-color="#fbf7ef"/>
@@ -133,6 +132,7 @@ export function madSvg(o, { b = 400, h = 280 } = {}) {
     <clipPath id="klip-${o.id}"><circle cx="${cx}" cy="${cy}" r="${(r * 0.96).toFixed(1)}"/></clipPath>
   </defs>
   <rect width="${b}" height="${h}" fill="url(#bg-${o.id})"/>
+  <circle cx="${(b * 0.86).toFixed(1)}" cy="${(h * 0.16).toFixed(1)}" r="${(r * 0.5).toFixed(1)}" fill="#ffffff" opacity="0.35"/>
   <ellipse cx="${cx}" cy="${(cy + r * 0.12).toFixed(1)}" rx="${(r * 1.06).toFixed(1)}" ry="${(r * 1.02).toFixed(1)}" fill="#2a231b" opacity="0.10"/>
   <circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="url(#tal-${o.id})"/>
   ${dybt ? `<circle cx="${cx}" cy="${cy}" r="${(r * 0.82).toFixed(1)}" fill="#000" opacity="0.05"/>` : ''}

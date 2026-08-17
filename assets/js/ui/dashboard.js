@@ -72,7 +72,20 @@ export function html() {
   const liste = byggListe(t);
   const over = u.kcal > maal.kcal * 1.05;
 
+  // Appen skal sige det højt, når den ikke kan levere det, den lover.
+  const advarsler = [];
+  if (u.daekning < 0.93) {
+    advarsler.push(`Planen når kun ${Math.round(u.daekning * 100)} % af dit kaloriemål. Slå flere måltider til under Mig — med de valgte måltider kan dagen ikke fyldes op.`);
+  }
+  if (u.protein < maal.protein * 0.9) {
+    advarsler.push(`Proteinet ligger ${tal(maal.protein - u.protein)} g under målet. Det er typisk fordi et fravalg har skåret proteinkilderne væk — prøv at slå et af dem fra igen.`);
+  }
+  if (u.mangler.length) {
+    advarsler.push(`Der er ingen retter tilbage til ${u.mangler.join(' og ')} med dine nuværende fravalg, så måltidet er sprunget over.`);
+  }
+
   return `
+  ${advarsler.map(a => `<p class="advarsel">${esc(a)}</p>`).join('')}
   <div class="hero kort">
     <div class="ring${over ? ' over' : ''}">${ring(u.kcal / maal.kcal)}
       <div class="ring-midte">
@@ -88,6 +101,7 @@ export function html() {
       ${makrobar('Kulhydrat', u.kulhydrat, maal.kulhydrat, 'var(--kulhydrat)')}
       ${makrobar('Fedt', u.fedt, maal.fedt, 'var(--fedt)')}
     </div>
+    ${u.fleks ? `<p class="finprint" style="text-align:center">Makroerne er regnet på de ${u.makroDage} dage med planlagt mad. Den frie aften tæller kun med i kalorierne.</p>` : ''}
   </div>
 
   <div class="stats">
@@ -109,7 +123,7 @@ export function html() {
     <div class="stat">
       <span class="label">Fibre</span>
       <span class="stat-vaerdi tal">${tal(u.fiber)}<small>g/dag</small></span>
-      <span class="stat-note ${u.fiber >= maal.fiber ? 'god' : ''}">${u.fiber >= maal.fiber ? 'Over anbefalingen' : `Målet er ${tal(maal.fiber)} g`}</span>
+      <span class="stat-note">${u.fiber >= maal.fiber ? `Over anbefalingen på ${tal(maal.fiber)} g` : `Målet er ${tal(maal.fiber)} g`}</span>
     </div>
   </div>
 

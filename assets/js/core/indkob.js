@@ -15,10 +15,11 @@ import { slotFaktor } from './plan.js';
 
 /** Runder op til noget, man kan finde ud af at veje af i butikken. */
 function pænMaengde(v, maengde) {
+  // Altid op. Runder man ned, mangler der råvarer til det sidste måltid.
   if (v.enh === 'stk') return Math.ceil(maengde - 0.001);
   if (maengde < 30) return Math.ceil(maengde);
-  if (maengde < 200) return Math.round(maengde / 10) * 10;
-  return Math.round(maengde / 25) * 25;
+  if (maengde < 200) return Math.ceil(maengde / 10) * 10;
+  return Math.ceil(maengde / 25) * 25;
 }
 
 /**
@@ -40,9 +41,10 @@ export function byggListe(tilstand, { grupperEfter = 'afdeling' } = {}) {
       const skala = (personer / o.basis) * slotFaktor(s, dag);
       for (const [noegle, maengde] of o.ing) {
         if (!VARER[noegle]) continue;
-        const post = total.get(noegle) || { maengde: 0, retter: new Set() };
+        const post = total.get(noegle) || { maengde: 0, retter: new Set(), prRet: new Map() };
         post.maengde += maengde * skala;
         post.retter.add(o.id);
+        post.prRet.set(o.id, (post.prRet.get(o.id) || 0) + maengde * skala);
         total.set(noegle, post);
       }
     }
@@ -63,6 +65,7 @@ export function byggListe(tilstand, { grupperEfter = 'afdeling' } = {}) {
       pakker: v.pakke ? Math.ceil(maengde / v.pakke) : null,
       alt: v.alt || null,
       retter: [...post.retter],
+      prRet: post.prRet,
       fast: !!v.fast
     };
     (v.fast ? fast : linjer).push(linje);
@@ -74,11 +77,20 @@ export function byggListe(tilstand, { grupperEfter = 'afdeling' } = {}) {
   let grupper;
   if (grupperEfter === 'opskrift') {
     const brugte = [...new Set(plan.dage.flatMap(d => d.slots.map(s => s.id)).filter(Boolean))];
+    // Under hver ret vises kun den mængde, netop den ret bruger — ikke hele
+    // ugens mængde af varen.
     grupper = brugte.map(id => ({
       id,
       navn: OPSKRIFT_INDEX[id].navn,
-      emoji: '🍽️',
-      varer: kilde.filter(l => l.retter.includes(id)).sort(sorter)
+      emoji: '',
+      varer: kilde
+        .filter(l => l.retter.includes(id))
+        .map(l => {
+          const v = VARER[l.noegle];
+          const m = pænMaengde(v, l.prRet.get(id) || 0);
+          return { ...l, maengde: m, pakker: v.pakke ? Math.ceil(m / v.pakke) : null };
+        })
+        .sort(sorter)
     })).filter(g => g.varer.length);
   } else {
     grupper = AFDELINGER

@@ -25,7 +25,7 @@ export function toast(besked) {
     el.setAttribute('role', 'status');
     Object.assign(el.style, {
       position: 'fixed', left: '50%', transform: 'translateX(-50%)',
-      bottom: 'calc(var(--bund) + 20px)', zIndex: '60',
+      bottom: 'calc(var(--bund) + 34px)', zIndex: '60',
       background: 'var(--text)', color: 'var(--bg)',
       padding: '10px 18px', borderRadius: '999px',
       fontSize: '14px', fontWeight: '600', boxShadow: 'var(--e3)',
@@ -37,5 +37,5 @@ export function toast(besked) {
   el.textContent = besked;
   requestAnimationFrame(() => { el.style.opacity = '1'; });
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2200);
+  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 1700);
 }

@@ -14,7 +14,7 @@
 export const OPSKRIFTER = [
   // ================= MORGENMAD =================
   {
-    id: 'm-skyrbowl', navn: 'Skyrbowl med blåbær, mandler og kanel', kategori: 'morgenmad',
+    id: 'm-skyrbowl', navn: 'Skyrbowl med blåbær og mandler', kategori: 'morgenmad',
     tid: 5, basis: 1, tags: ['lyn', 'ingen-madlavning'],
     kort: 'Iskold skyr, sprøde havregryn og bær, der stadig knaser lidt af frost.',
     ing: [['skyr', 250], ['blaabaer', 80], ['mandler', 15], ['havregryn', 25]],
@@ -26,7 +26,7 @@ export const OPSKRIFTER = [
     tip: 'Kanel + frosne bær er det, der gør den til en dessert i stedet for en kur.'
   },
   {
-    id: 'm-havregrod', navn: 'Proteingrød med banan og peanutbutter', kategori: 'morgenmad',
+    id: 'm-havregrod', navn: 'Proteingrød med banan', kategori: 'morgenmad',
     tid: 8, basis: 1, tags: ['varm', 'maetter-laenge'],
     kort: 'Cremet grød, der smager af bananbrød — og holder helt til frokost.',
     ing: [['havregryn', 60], ['minimaelk', 200], ['proteinpulver', 20], ['banan', 1], ['peanutbutter', 10]],
@@ -50,7 +50,7 @@ export const OPSKRIFTER = [
     tip: 'Lav varme = cremet røræg. Høj varme = gummi.'
   },
   {
-    id: 'm-omelet', navn: 'Omelet med spinat, feta og champignon', kategori: 'morgenmad',
+    id: 'm-omelet', navn: 'Omelet med spinat og feta', kategori: 'morgenmad',
     tid: 12, basis: 1, tags: ['lavt-kulhydrat'],
     kort: 'Gylden omelet med salt feta og champignon stegt mørke i kanten.',
     ing: [['aeg', 3], ['spinat', 60], ['feta', 30], ['champignon', 80], ['olie', 5]],
@@ -74,7 +74,7 @@ export const OPSKRIFTER = [
     tip: 'Lav tre glas søndag aften, så er mandag, tirsdag og onsdag klaret.'
   },
   {
-    id: 'm-hytteosttoast', navn: 'Rugbrød med hytteost, tomat og blødkogt æg', kategori: 'morgenmad',
+    id: 'm-hytteosttoast', navn: 'Rugbrød med hytteost og æg', kategori: 'morgenmad',
     tid: 8, basis: 1, tags: ['lyn'],
     kort: 'Rugbrød med tykt lag hytteost og et æg med blød blomme.',
     ing: [['rugbrod', 80], ['hytteost', 100], ['aeg', 1], ['cherrytomat', 60]],
@@ -138,7 +138,7 @@ export const OPSKRIFTER = [
     tip: 'Holder sig fint 2 dage i køleskabet — den bliver faktisk bedre dag 2.'
   },
   {
-    id: 'f-prepbowl', navn: 'Meal-prep bowl med kylling, bulgur og tzatziki', kategori: 'frokost',
+    id: 'f-prepbowl', navn: 'Meal-prep bowl med kylling og bulgur', kategori: 'frokost',
     tid: 20, basis: 2, tags: ['meal-prep'],
     kort: 'Bowlen, du laver én gang og glæder dig til to dage i træk.',
     ing: [['kyllingebryst', 300], ['bulgur', 100], ['agurk', 150], ['cherrytomat', 150], ['feta', 40],
@@ -152,7 +152,7 @@ export const OPSKRIFTER = [
     tip: 'Tzatziki ved siden af, ikke i boksen. Ellers bliver bunden vandet dag 2.'
   },
   {
-    id: 'f-laksesalat', navn: 'Laksesalat med edamame, avocado og sesam', kategori: 'frokost',
+    id: 'f-laksesalat', navn: 'Laksesalat med edamame og avocado', kategori: 'frokost',
     tid: 15, basis: 2, tags: ['omega-3'],
     kort: 'Sprød salat, varm laks og sesam — frokost med restaurantfølelse.',
     ing: [['laks', 250], ['edamame', 150], ['salatmix', 150], ['avocado', 1], ['forarslog', 30],
@@ -166,7 +166,7 @@ export const OPSKRIFTER = [
     tip: 'Fed fisk 2 gange om ugen — det er en af de få kostvaner, der er værd at være firkantet omkring.'
   },
   {
-    id: 'f-wrap', navn: 'Hummuswrap med kikærter, spinat og peberfrugt', kategori: 'frokost',
+    id: 'f-wrap', navn: 'Hummuswrap med kikærter og spinat', kategori: 'frokost',
     tid: 10, basis: 2, tags: ['vegetarisk', 'lyn', 'to-go'],
     kort: 'Cremet hummus, krydrede kikærter og masser af crunch.',
     ing: [['tortilla', 4], ['hummus', 80], ['kikaerter', 240], ['spinat', 80], ['peberfrugt', 150],
@@ -179,7 +179,7 @@ export const OPSKRIFTER = [
     tip: 'Mos en del af kikærterne — så falder fyldet ikke ud af wrappen.'
   },
   {
-    id: 'f-rejesalat', navn: 'Rejesalat med avocado, agurk og chili-lime', kategori: 'frokost',
+    id: 'f-rejesalat', navn: 'Rejesalat med avocado og chili-lime', kategori: 'frokost',
     tid: 10, basis: 2, tags: ['lyn', 'lavt-kulhydrat'],
     kort: 'Let, frisk og syrlig — og klar på ti minutter.',
     ing: [['rejer', 250], ['avocado', 1], ['agurk', 200], ['salatmix', 120], ['rodlog', 40],
@@ -192,7 +192,7 @@ export const OPSKRIFTER = [
     tip: 'Dup rejerne rigtig tørre — våde rejer udvander hele salaten.'
   },
   {
-    id: 'f-pastasalat', navn: 'Pestopastasalat med kylling og cherrytomater', kategori: 'frokost',
+    id: 'f-pastasalat', navn: 'Pestopastasalat med kylling', kategori: 'frokost',
     tid: 20, basis: 2, tags: ['meal-prep'],
     kort: 'Pesto rørt op i skyr, så den smager fed uden at være det.',
     ing: [['pasta', 140], ['kyllingebryst', 300], ['cherrytomat', 200], ['spinat', 80], ['pesto', 30],
@@ -206,7 +206,7 @@ export const OPSKRIFTER = [
     tip: 'Pesto rørt op med skyr: halv så mange kalorier, samme smag.'
   },
   {
-    id: 'f-linsesuppe', navn: 'Krydret linsesuppe med gulerod og spidskommen', kategori: 'frokost',
+    id: 'f-linsesuppe', navn: 'Krydret linsesuppe med gulerod', kategori: 'frokost',
     tid: 25, basis: 4, tags: ['vegetarisk', 'meal-prep', 'batch'],
     kort: 'Varm, krydret og mættende. Én gryde, fire frokoster.',
     ing: [['linser', 250], ['gulerod', 400], ['log', 150], ['hvidlog', 3], ['hakkedetomater', 400],
@@ -220,7 +220,7 @@ export const OPSKRIFTER = [
     tip: 'Én gryde = fire frokoster. Fryser fint i portionsbokse.'
   },
   {
-    id: 'f-greenbowl', navn: 'Grøn powerbowl med æg, edamame og græskarkerner', kategori: 'frokost',
+    id: 'f-greenbowl', navn: 'Grøn powerbowl med æg og edamame', kategori: 'frokost',
     tid: 12, basis: 2, tags: ['vegetarisk', 'lyn'],
     kort: 'Grønt, æg og kerner — skålen, der faktisk holder til klokken 17.',
     ing: [['aeg', 4], ['edamame', 160], ['salatmix', 150], ['avocado', 1], ['gulerod', 150],
@@ -262,7 +262,7 @@ export const OPSKRIFTER = [
     tip: 'Ét lag på pladen — ligger det i bunker, damper det i stedet for at brune.'
   },
   {
-    id: 'a-frikadeller', navn: 'Krydrede frikadeller med tzatziki og ovngrønt', kategori: 'aftensmad',
+    id: 'a-frikadeller', navn: 'Frikadeller med tzatziki og ovngrønt', kategori: 'aftensmad',
     tid: 30, basis: 2, tags: ['familie', 'meal-prep'],
     kort: 'Saftige frikadeller, kølig tzatziki og ovnbagt grønt med mørke kanter.',
     ing: [['hakketkalkun', 400], ['aeg', 1], ['havregryn', 30], ['log', 80], ['squash', 300],
@@ -276,7 +276,7 @@ export const OPSKRIFTER = [
     tip: 'Havregryn i stedet for rasp: mere fiber, og farsen bliver mere saftig.'
   },
   {
-    id: 'a-laksovn', navn: 'Ovnbagt laks med sprød broccoli og kartofler', kategori: 'aftensmad',
+    id: 'a-laksovn', navn: 'Ovnbagt laks med sprød broccoli', kategori: 'aftensmad',
     tid: 25, basis: 2, tags: ['en-plade', 'omega-3'],
     kort: 'Laks, sprød broccoli og kartoffelbåde — alt sammen fra samme plade.',
     ing: [['laks', 300], ['broccoli', 400], ['kartofler', 500], ['citron', 1], ['olie', 15], ['hvidlog', 2], ['persille', 10]],
@@ -316,7 +316,7 @@ export const OPSKRIFTER = [
     tip: 'Det revne grønt er tricket: samme tallerken, langt færre kalorier, ingen der opdager det.'
   },
   {
-    id: 'a-torsk', navn: 'Bagt torsk med sennepssauce, kartofler og ærter', kategori: 'aftensmad',
+    id: 'a-torsk', navn: 'Bagt torsk med sennepssauce', kategori: 'aftensmad',
     tid: 25, basis: 2, tags: ['let'],
     kort: 'Sprød sennepssauce til mør torsk. Gammeldags god, bare let.',
     ing: [['torsk', 400], ['kartofler', 500], ['aerter', 250], ['gyoghurt', 100], ['sennep', 15],
@@ -397,7 +397,7 @@ export const OPSKRIFTER = [
       'Rør spinaten i til den falder sammen.',
       'Drys mozzarella over, låg på i 4 minutter — eller under grill i ovnen til den bobler.'
     ],
-    tip: 'Al lasagnens smag, ingen plader, halv tid, en tredjedel af kalorierne.'
+    tip: 'Al lasagnens smag, ingen plader, halv tid — og cirka det halve af kalorierne.'
   },
   {
     id: 'a-graeskkylling', navn: 'Græsk ovnkylling med feta og tomat', kategori: 'aftensmad',
@@ -427,7 +427,7 @@ export const OPSKRIFTER = [
     tip: 'Byg-selv-tacos er den nemmeste måde at spise sammen med familien uden at spise som dem.'
   },
   {
-    id: 'a-sodkartoffel', navn: 'Sød kartoffel-bowl med kikærter og peanutdressing', kategori: 'aftensmad',
+    id: 'a-sodkartoffel', navn: 'Sød kartoffel-bowl med kikærter', kategori: 'aftensmad',
     tid: 25, basis: 2, tags: ['vegetarisk', 'en-plade'],
     kort: 'Sprøde kikærter, søde kartofler og en peanutdressing, man vil have mere af.',
     ing: [['sodkartoffel', 500], ['kikaerter', 480], ['spinat', 100], ['rodlog', 80], ['peanutbutter', 30],
@@ -441,7 +441,7 @@ export const OPSKRIFTER = [
     tip: 'Kikærter bagt sprøde er kødfri mad, man rent faktisk glæder sig til.'
   },
   {
-    id: 'a-pestolaks', navn: 'Pestolaks med fuldkornspasta og cherrytomater', kategori: 'aftensmad',
+    id: 'a-pestolaks', navn: 'Pestolaks med fuldkornspasta', kategori: 'aftensmad',
     tid: 20, basis: 2, tags: ['lyn', 'omega-3'],
     kort: 'Laks, pesto og tomater, der springer i panden. Tyve minutter.',
     ing: [['laks', 300], ['pasta', 140], ['cherrytomat', 250], ['spinat', 100], ['pesto', 30],
@@ -456,7 +456,7 @@ export const OPSKRIFTER = [
   },
 
   {
-    id: 'f-caesar', navn: 'Sprød kyllingesalat med parmesan og citrondressing', kategori: 'frokost',
+    id: 'f-caesar', navn: 'Kyllingesalat med parmesan', kategori: 'frokost',
     tid: 15, basis: 2, tags: ['salat', 'lyn', 'favorit'],
     kort: 'Caesar-følelsen med sprøde rugbrødscroutoner og cremet citrondressing.',
     ing: [['kyllingebryst', 350], ['salatmix', 200], ['cherrytomat', 150], ['agurk', 150], ['parmesan', 25],
@@ -470,7 +470,7 @@ export const OPSKRIFTER = [
     tip: 'Caesar-følelsen uden mayonnaisen: skyr + sennep + parmesan gør præcis det samme arbejde.'
   },
   {
-    id: 'f-tunpoke', navn: 'Tun-pokebowl med avocado, edamame og soja-lime', kategori: 'frokost',
+    id: 'f-tunpoke', navn: 'Tun-pokebowl med avocado', kategori: 'frokost',
     tid: 15, basis: 2, tags: ['salat', 'lyn', 'meal-prep', 'favorit'],
     kort: 'Farverig bowl med tun, avocado og soja-lime. Den bedste madpakke på listen.',
     ing: [['tun', 260], ['ris', 120], ['edamame', 150], ['avocado', 1], ['agurk', 150], ['gulerod', 120],
@@ -484,7 +484,7 @@ export const OPSKRIFTER = [
     tip: 'Bygget i en boks med dressingen for sig er det den bedste madpakke på listen.'
   },
   {
-    id: 'a-sesamlaks', navn: 'Sesamlaks med sprød agurksalat og ris', kategori: 'aftensmad',
+    id: 'a-sesamlaks', navn: 'Sesamlaks med agurksalat', kategori: 'aftensmad',
     tid: 20, basis: 2, tags: ['lyn', 'omega-3', 'favorit'],
     kort: 'Klistret sesamlaks med sprød agurksalat — restaurant på en tirsdag.',
     ing: [['laks', 300], ['ris', 150], ['agurk', 250], ['gulerod', 120], ['forarslog', 30], ['soja', 25],
@@ -496,6 +496,76 @@ export const OPSKRIFTER = [
       'Server laksen på risene med agurksalaten ved siden af og sesam over.'
     ],
     tip: 'Honningen karamelliserer på laksen — 10 g til to personer er nok til at gøre hele retten "restaurant".'
+  },
+
+  {
+    id: 'a-linsebolognese', navn: 'Linsebolognese med masser af grønt', kategori: 'aftensmad',
+    tid: 25, basis: 4, tags: ['vegetarisk', 'batch', 'familie'],
+    kort: 'Kødfri bolognese med bid i — den sniger sig ind på selv de skeptiske.',
+    ing: [['linser', 220], ['hakkedetomater', 800], ['gulerod', 250], ['squash', 200], ['log', 150],
+          ['hvidlog', 3], ['tomatpure', 60], ['pasta', 280], ['olie', 15], ['krydderi', 8], ['parmesan', 30]],
+    fremgang: [
+      'Riv gulerod og squash groft og svits det med hakket løg og hvidløg i olien i 5 minutter.',
+      'Tilsæt tomatpuré og krydderier, rør et minut, og kom så linser og hakkede tomater i sammen med 3 dl vand.',
+      'Lad det simre 15 minutter, til linserne er møre og saucen tyk. Smag godt til med salt, peber og oregano.',
+      'Kog pastaen imens, og riv parmesan over ved serveringen.'
+    ],
+    tip: 'Røde linser koger ud og bliver til sauce — det er dem, der giver den kødagtige fylde.'
+  },
+  {
+    id: 'a-kikaertekarry', navn: 'Kikærtekarry med spinat og edamame', kategori: 'aftensmad',
+    tid: 22, basis: 2, tags: ['vegetarisk', 'lyn', 'laktosefri'],
+    kort: 'Cremet, krydret og mættende — uden et gram mælkeprodukt.',
+    ing: [['kikaerter', 480], ['kokosmaelk', 250], ['karrypasta', 30], ['spinat', 150], ['edamame', 150],
+          ['sodkartoffel', 350], ['ris', 120], ['lime', 1], ['olie', 10], ['ingefaer', 10]],
+    fremgang: [
+      'Sæt risene over. Steg karrypasta og revet ingefær 30 sekunder i olien.',
+      'Kom søde kartofler i tern og kokosmælk i, og lad det simre 10-12 minutter under låg.',
+      'Tilsæt drænede kikærter og edamame, og lad det få 3 minutter mere.',
+      'Rør spinaten i til den falder sammen, og smag til med limesaft og salt.'
+    ],
+    tip: 'Kikærter og edamame sammen giver en kødfri ret, der faktisk mætter til næste morgen.'
+  },
+  {
+    id: 'm-aeggemuffins', navn: 'Æggemuffins med peberfrugt og spinat', kategori: 'morgenmad',
+    tid: 25, basis: 2, tags: ['meal-prep', 'laktosefri', 'lavt-kulhydrat'],
+    kort: 'Bag én gang søndag, spis morgenmad tre dage uden at tænke.',
+    ing: [['aeg', 6], ['peberfrugt', 150], ['spinat', 80], ['forarslog', 30], ['olie', 8], ['krydderi', 4]],
+    fremgang: [
+      'Tænd ovnen på 180°. Hak peberfrugt, spinat og forårsløg fint.',
+      'Pisk æggene med salt, peber og paprika, og vend grøntsagerne i.',
+      'Fordel i en smurt muffinform og bag 18-20 minutter, til de er lige akkurat faste.',
+      'De holder sig fire dage i køleskabet og kan spises kolde eller lunet 30 sekunder.'
+    ],
+    tip: 'Tag dem ud, når de stadig hæver lidt — de sætter sig selv de sidste to minutter.'
+  },
+  {
+    id: 'f-kyllingsalat', navn: 'Kyllingesalat med avocado og lime', kategori: 'frokost',
+    tid: 15, basis: 2, tags: ['salat', 'lyn', 'laktosefri', 'favorit'],
+    kort: 'Sprød salat, varm kylling og en dressing der kun er lime, olie og salt.',
+    ing: [['kyllingebryst', 320], ['salatmix', 150], ['avocado', 1], ['majs', 100], ['cherrytomat', 150],
+          ['rodlog', 40], ['lime', 1], ['olie', 12], ['krydderi', 5], ['graeskarkerner', 20]],
+    fremgang: [
+      'Vend kyllingen i strimler med paprika, spidskommen og salt, og steg den 6-7 minutter ved høj varme.',
+      'Bland salat, majs, halverede tomater og tyndt snittet rødløg i en stor skål.',
+      'Pisk limesaft, olie, salt og peber sammen og vend salaten i det.',
+      'Læg kyllingen og avocado i både øverst, og drys græskarkerner over.'
+    ],
+    tip: 'Lad kyllingen hvile to minutter, før du lægger den på — ellers udvander den salaten.'
+  },
+  {
+    id: 'f-tunbowl', navn: 'Tunbowl med kikærter og sprødt grønt', kategori: 'frokost',
+    tid: 10, basis: 2, tags: ['lyn', 'ingen-madlavning', 'laktosefri', 'favorit'],
+    kort: 'Ti minutter, ingen pande, og protein nok til at holde til aftensmaden.',
+    ing: [['tun', 260], ['kikaerter', 240], ['agurk', 150], ['cherrytomat', 150], ['peberfrugt', 120],
+          ['rodlog', 40], ['olie', 12], ['citron', 1], ['persille', 10], ['graeskarkerner', 20]],
+    fremgang: [
+      'Dræn tun og kikærter godt af.',
+      'Skær agurk, tomater og peberfrugt i grove tern og snit rødløget tyndt.',
+      'Vend det hele med olie, citronsaft, hakket persille, salt og peber.',
+      'Græskarkerner over til sidst, så der er noget at bide i.'
+    ],
+    tip: 'Bygget i en boks holder den to dage — bare vent med citronen til du spiser den.'
   },
 
   // ================= SNACKS =================
@@ -519,13 +589,13 @@ export const OPSKRIFTER = [
     id: 's-shake', navn: 'Proteinshake efter Bodypump', kategori: 'snack',
     tid: 2, basis: 1, tags: ['efter-traening'],
     kort: 'Efter Bodypump: protein og kreatin i ét glas.',
-    ing: [['proteinpulver', 30], ['minimaelk', 300], ['banan', 1], ['kreatin', 5]],
+    ing: [['proteinpulver', 30], ['minimaelk', 300], ['banan', 1]],
     fremgang: [
       'Ryst proteinpulver og mælk sammen i en shaker.',
-      'Rør kreatinen i — den behøver ikke være lige efter træning, men det er nemt at huske dér.',
+      'Tag dagens 3-5 g kreatin sammen med den — ikke fordi timingen betyder noget, men fordi det er nemt at huske.',
       'Bananen kan spises ved siden af eller blendes med.'
     ],
-    tip: '5 g kreatin hver dag — også på hviledage. Timingen er ligegyldig, konsekvensen er ikke.'
+    tip: 'Kreatin skal tages hver dag — også på hviledage. Det står ikke på indkøbslisten, fordi det ikke er en dagligvare.'
   },
   {
     id: 's-hytteost', navn: 'Hytteost med knækbrød og peberfrugt', kategori: 'snack',
@@ -554,13 +624,13 @@ export const OPSKRIFTER = [
   {
     id: 's-popcorn', navn: 'Hjemmepoppede popcorn', kategori: 'snack',
     tid: 6, basis: 1, tags: ['aftenhygge', 'volumen'],
-    kort: 'En kæmpe skål for omkring 150 kcal.',
+    kort: 'En kæmpe skål, der tager en hel aften at spise.',
     ing: [['popcornkerner', 25], ['olie', 5]],
     fremgang: [
       'Varm olien i en gryde med låg, kom kernerne i og ryst gryden let.',
       'Tag den af varmen, når der går 2-3 sekunder mellem poppene. Salt over.'
     ],
-    tip: 'En kæmpe skål for ~110 kcal. Volumen er det bedste våben mod aftentrangen.'
+    tip: 'En kæmpe skål for omkring 140 kcal. Volumen er det bedste våben mod aftentrangen.'
   },
   {
     id: 's-chokolade', navn: 'Mørk chokolade og et par mandler', kategori: 'snack',
