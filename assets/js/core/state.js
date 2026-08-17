@@ -32,6 +32,8 @@ export const STANDARD = Object.freeze({
     maxTid: 30,
     undgaa: [],
     rester: true,
+    udeMorgenmad: false,   // morgenmad i hverdagen spises ude (kantine/buffet)
+    udeFrokost: false,     // frokost i hverdagen spises ude
     fleksAften: true,
     fleksDag: 4,
     fasteVarer: false

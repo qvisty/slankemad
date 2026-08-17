@@ -45,11 +45,20 @@ function slotVaegte(slots) {
   return raa.map(v => v / sum);
 }
 
-export function pulje(slot, tilstand) {
+/** Spises dette måltid ude denne dag? Hverdage er dag 0-4 i planen. */
+export function spisesUde(slot, dagNr, valg) {
+  if (dagNr > 4) return false;                       // weekend laver du selv
+  if (slot === 'morgenmad') return !!valg.udeMorgenmad;
+  if (slot === 'frokost') return !!valg.udeFrokost;
+  return false;
+}
+
+export function pulje(slot, tilstand, ude = false) {
   const { valg, fravalgte } = tilstand;
   const tidsloft = valg.maxTid + (slot === 'aftensmad' ? 5 : 0);
   const alle = OPSKRIFTER.filter(o => {
     if (o.kategori !== slot) return false;
+    if (!!o.ude !== !!ude) return false;              // ude-måltider blandes ikke med dem, du selv laver
     const mrk = markorer(o);
     if (valg.undgaa.some(u => mrk.has(u))) return false;
     return true;
@@ -75,8 +84,12 @@ function portionsfaktorer(valgte, slots, budget) {
   const faktorer = valgte.map((o, i) => {
     const kcal = makro(o).kcal;
     if (kcal <= 0) return 1;
+    // Et måltid, du får serveret, kan du ikke skalere frit — du tager omtrent
+    // en normal portion. Det, du selv laver, må gerne blive større eller mindre.
+    const min = o.ude ? 0.9 : MIN_FAKTOR;
+    const maks = o.ude ? 1.15 : MAKS_FAKTOR;
     const del = budget * (vaegte[i] ?? (1 / valgte.length));
-    return Math.round(Math.min(MAKS_FAKTOR, Math.max(MIN_FAKTOR, del / kcal)) * 20) / 20;
+    return Math.round(Math.min(maks, Math.max(min, del / kcal)) * 20) / 20;
   });
   let kcal = 0, protein = 0;
   valgte.forEach((o, i) => {
@@ -118,7 +131,7 @@ function score(valgte, slots, ctx, maalKcal) {
     const gange = ctx.brugte.get(o.id) || 0;
     const erRester = o.id === ctx.forrigeAften && o.kategori === 'aftensmad';
     if (erRester && ctx.valg.rester) straf -= 10;                        // rester er en gevinst
-    else straf += gange * 18;                                            // ellers: variation
+    else straf += gange * 45;                                            // ellers: variation — samme ret to gange på en uge er dyrt
 
     if (ctx.favoritter.includes(o.id)) straf -= 22;                      // dine egne favoritter vejer tungest
     else if (harFavoritVare(o)) straf -= 7;                              // kylling, laks, tun, salat …
@@ -160,7 +173,8 @@ function byggDag(ctx, dagNr, traener) {
   const slots = [];
   const puljer = [];
   for (const s of oenskede) {
-    const p = pulje(s, ctx.tilstand);
+    const ude = spisesUde(s, dagNr, ctx.valg);
+    const p = pulje(s, ctx.tilstand, ude);
     if (!p.length) { if (!mangler.includes(s)) mangler.push(s); continue; }
     slots.push(s);
     puljer.push(p);
@@ -177,7 +191,8 @@ function byggDag(ctx, dagNr, traener) {
   for (let i = 0; i < FORSOEG; i++) {
     const valgte = puljer.map((p, j) => {
       if (fleks && slots[j] === 'aftensmad') return null;
-      if (ctx.valg.rester && slots[j] === 'frokost' && ctx.forrigeAften && Math.random() < 0.4) {
+      if (ctx.valg.rester && slots[j] === 'frokost' && !spisesUde('frokost', dagNr, ctx.valg)
+          && ctx.forrigeAften && Math.random() < 0.4) {
         const rest = OPSKRIFT_INDEX[ctx.forrigeAften];
         if (rest) return rest;
       }
@@ -295,7 +310,7 @@ export function bytRet(tilstand, dagIndex, slotIndex) {
   if (!s || s.fleks) return plan;
 
   const brugte = new Set(plan.dage.flatMap(d => d.slots.map(x => x.id)).filter(Boolean));
-  const p = pulje(s.slot, tilstand).filter(o => o.id !== s.id);
+  const p = pulje(s.slot, tilstand, spisesUde(s.slot, dagIndex, tilstand.valg)).filter(o => o.id !== s.id);
   if (!p.length) return plan;
 
   const favoritterFoerst = p.filter(o => tilstand.favoritter.includes(o.id) && !brugte.has(o.id));

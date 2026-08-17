@@ -37,7 +37,7 @@ export function byggListe(tilstand, { grupperEfter = 'afdeling' } = {}) {
     for (const s of dag.slots) {
       if (!s.id) continue;
       const o = OPSKRIFT_INDEX[s.id];
-      if (!o) continue;
+      if (!o || o.ude) continue;      // det, du får serveret, køber du ikke ind til
       const skala = (personer / o.basis) * slotFaktor(s, dag);
       for (const [noegle, maengde] of o.ing) {
         if (!VARER[noegle]) continue;
@@ -76,7 +76,7 @@ export function byggListe(tilstand, { grupperEfter = 'afdeling' } = {}) {
 
   let grupper;
   if (grupperEfter === 'opskrift') {
-    const brugte = [...new Set(plan.dage.flatMap(d => d.slots.map(s => s.id)).filter(Boolean))];
+    const brugte = [...new Set(plan.dage.flatMap(d => d.slots.map(s => s.id)).filter(id => id && !OPSKRIFT_INDEX[id]?.ude))];
     // Under hver ret vises kun den mængde, netop den ret bruger — ikke hele
     // ugens mængde af varen.
     grupper = brugte.map(id => ({
@@ -109,7 +109,7 @@ export function byggListe(tilstand, { grupperEfter = 'afdeling' } = {}) {
     grupper,
     fast: tilstand.valg.fasteVarer ? [] : fast,
     antal: kilde.length,
-    retter: new Set(plan.dage.flatMap(d => d.slots.map(s => s.id)).filter(Boolean)).size,
+    retter: new Set(plan.dage.flatMap(d => d.slots.map(s => s.id)).filter(id => id && !OPSKRIFT_INDEX[id]?.ude)).size,
     genbrug
   };
 }

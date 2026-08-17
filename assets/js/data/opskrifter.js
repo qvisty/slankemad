@@ -568,6 +568,89 @@ export const OPSKRIFTER = [
     tip: 'Bygget i en boks holder den to dage — bare vent med citronen til du spiser den.'
   },
 
+  /* ================= UDE: KANTINE OG BUFFET =================
+     Måltider, du ikke selv laver. De havner aldrig på indkøbslisten, men de
+     tæller med i dine kalorier og makroer, så ugen hænger sammen.
+     Mængderne er kvalificerede skøn på, hvad du tager på tallerkenen — ikke
+     opskrifter. Justér dem efter, hvad der faktisk står frem. */
+  {
+    id: 'u-skyr', navn: 'Skyr med havregryn, frugt og kerner', kategori: 'morgenmad',
+    ude: true, sted: 'Buffeten', tid: 3, basis: 1, tags: ['ude', 'lyn'],
+    kort: 'Buffetens bedste bytte: skyr i bunden, alt det andet ovenpå.',
+    ing: [['skyr', 300], ['havregryn', 40], ['banan', 1], ['blaabaer', 60], ['graeskarkerner', 15]],
+    fremgang: [
+      'Fyld skålen halvt op med skyr, før du gør noget andet. Det er hele forskellen på denne morgenmad og en skål müsli.',
+      'Havregryn oveni — ikke müsli eller cornflakes, hvis du kan vælge. Et par spiseskefulde, ikke en øse.',
+      'Frugt og et drys kerner på toppen.'
+    ],
+    tip: 'Er der kun én ting, du gør ved buffeten, så er det at tage skyren først og brødet bagefter.'
+  },
+  {
+    id: 'u-rugbrod', navn: 'Rugbrød med æg og ost', kategori: 'morgenmad',
+    ude: true, sted: 'Buffeten', tid: 3, basis: 1, tags: ['ude', 'lyn'],
+    kort: 'Når du er træt af skyr — men stadig skal have protein med.',
+    ing: [['rugbrod', 80], ['aeg', 2], ['ost', 25], ['agurk', 60]],
+    fremgang: [
+      'To skiver rugbrød — ikke lyst brød, hvis der er valgmulighed.',
+      'Æg på den ene, ost på den anden. Æggene er dem, der gør, at du ikke er sulten klokken ti.',
+      'Agurk eller tomat ved siden af.'
+    ],
+    tip: 'Ost er ikke problemet — mængden er. En skive pr. mad, ikke tre.'
+  },
+  {
+    id: 'u-salatbar-kylling', navn: 'Salatbar med kylling og kikærter', kategori: 'frokost',
+    ude: true, sted: 'Salatbaren', tid: 5, basis: 1, tags: ['ude', 'salat', 'favorit'],
+    kort: 'Salatbaren er dit bedste kort på ugens travleste dage.',
+    ing: [['salatmix', 200], ['kyllingebryst', 150], ['kikaerter', 150], ['cherrytomat', 100],
+          ['agurk', 100], ['feta', 25], ['olie', 10]],
+    fremgang: [
+      'Tag proteinet først: to gode øser kylling, tun, æg eller bønner. Det er den beslutning, der afgør måltidet.',
+      'Fyld resten af tallerkenen med grønt — gerne to-tre slags, så det ikke bliver kedeligt.',
+      'Dressing: olie og eddike frem for de cremede. En cremet dressing kan alene være 200 kcal.',
+      'Er du stadig sulten, så tag mere grønt og mere protein — ikke mere brød.'
+    ],
+    tip: 'Halvdelen grønt, en fjerdedel protein, en fjerdedel kulhydrat. Du behøver ikke veje noget.'
+  },
+  {
+    id: 'u-salatbar-tun', navn: 'Salatbar med tun, æg og majs', kategori: 'frokost',
+    ude: true, sted: 'Salatbaren', tid: 5, basis: 1, tags: ['ude', 'salat', 'favorit'],
+    kort: 'Samme princip, anden smag — så salatbaren ikke bliver en straf.',
+    ing: [['salatmix', 200], ['tun', 130], ['aeg', 2], ['majs', 60], ['agurk', 100],
+          ['cherrytomat', 100], ['rodlog', 30], ['olie', 8]],
+    fremgang: [
+      'Tun og æg først — de fylder lidt på tallerkenen og meget i mætheden.',
+      'Majs og rødløg giver sødme og bid, så det ikke smager af sundhed.',
+      'Olie, eddike, salt og peber. Færdig.'
+    ],
+    tip: 'To æg oveni salaten er 13 g protein for 156 kcal. Det er det billigste protein på hele buffeten.'
+  },
+  {
+    id: 'u-hovedret', navn: 'Halv portion af dagens varme ret + stor salat', kategori: 'frokost',
+    ude: true, sted: 'Kantinen', tid: 5, basis: 1, tags: ['ude'],
+    kort: 'Du behøver ikke springe den varme ret over — du skal bare fylde tallerkenen i den rigtige rækkefølge.',
+    ing: [['salatmix', 150], ['cherrytomat', 80], ['agurk', 80], ['kartofler', 150],
+          ['hakketokse', 110], ['olie', 6]],
+    fremgang: [
+      'Tag salat på tallerkenen FØRST, så der fysisk er mindre plads til resten. Det lyder som et trick, og det er det — det virker alligevel.',
+      'Halv portion af den varme ret. Er den paneret, cremet eller svømmer i sovs, så tag en tredjedel og mere salat.',
+      'Sovs ved siden af i stedet for hen over — så bestemmer du selv mængden.',
+      'Spis salaten først. Så træffer du beslutningen om en ekstra portion, mens du allerede er halvmæt.'
+    ],
+    tip: 'Tallene her er et gennemsnitligt skøn for en varm ret. Er dagens ret pasta med flødesovs, så regn 300 kcal mere.'
+  },
+  {
+    id: 'u-formiddag', navn: 'Formiddagsmad: rugbrød med ost', kategori: 'snack',
+    ude: true, sted: 'Kantinen', tid: 2, basis: 1, tags: ['ude'],
+    kort: 'Formiddagsmaden på de dage, hvor du skal træne — eller hvor frokosten er langt væk.',
+    ing: [['rugbrod', 50], ['ost', 20], ['aeble', 1]],
+    fremgang: [
+      'Én skive rugbrød med ost, og et stykke frugt til.',
+      'Tag den, hvis du træner senere på dagen, eller hvis der er over fem timer til frokost.',
+      'Spring den over på hviledage, hvor du ikke er sulten — det er de nemmeste 250 kcal at undvære i hele ugen.'
+    ],
+    tip: 'Er du sulten klokken ti hver dag, er det som regel morgenmaden, der var for lille — ikke maven, der er umættelig.'
+  },
+
   // ================= SNACKS =================
   {
     id: 's-skyrsnack', navn: 'Skyr med kanel og mandler', kategori: 'snack',

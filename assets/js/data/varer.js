@@ -54,6 +54,7 @@ export const VARER = {
   parmesan:       { navn: 'Parmesan eller Grana Padano', afd: 'kol', enh: 'g', kcal: 400, p: 33, k: 0, f: 29, fib: 0, pakke: 200, mrk: ['laktose'], pris: 3, farve: '#f2e2b6', alt: 'Sælges typisk i stykke — riv selv, det smager bedre' },
   minimaelk:      { navn: 'Minimælk',                afd: 'kol', enh: 'ml', kcal: 39, p: 3.5, k: 4.8, f: 0.5, fib: 0, pakke: 1000, mrk: ['laktose'], pris: 1, farve: '#fbfbf7' },
   cremefraiche:   { navn: 'Cremefraiche 9%',         afd: 'kol', enh: 'g', kcal: 115, p: 3, k: 3.5, f: 9, fib: 0, pakke: 500, mrk: ['laktose'], pris: 1, farve: '#fcf9f0' },
+  ost:            { navn: 'Ost (skæreost 30+)',      afd: 'kol', enh: 'g', kcal: 340, p: 25, k: 0, f: 27, fib: 0, pakke: 350, mrk: ['laktose'], pris: 2, farve: '#f0dc9a' },
   hummus:         { navn: 'Hummus',                  afd: 'kol', enh: 'g', kcal: 250, p: 7, k: 12, f: 18, fib: 5, pakke: 200, mrk: [], pris: 2, farve: '#e6d3a8' },
 
   /* ---------------- Frugt & grønt ---------------- */

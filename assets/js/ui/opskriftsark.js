@@ -31,7 +31,7 @@ export function visOpskrift(id, { portioner, faktor = 1 } = {}) {
   const o = OPSKRIFT_INDEX[id];
   if (!o) return;
   const t = hent();
-  const pers = portioner || Math.max(1, Number(t.valg.personer) || 1);
+  const pers = o.ude ? 1 : (portioner || Math.max(1, Number(t.valg.personer) || 1));
   const m = makro(o);
   const skala = (pers / o.basis) * faktor;
 
@@ -41,7 +41,7 @@ export function visOpskrift(id, { portioner, faktor = 1 } = {}) {
     <div class="ark-billede">${madSvg(o, { b: 400, h: 168 })}</div>
     <div class="ark-krop">
       <div>
-        <p class="label">${esc(kategoriNavn(o.kategori))} · ${minutter(o.tid)}</p>
+        <p class="label">${esc(kategoriNavn(o.kategori))} · ${o.ude ? esc(o.sted || 'ude') : minutter(o.tid)}</p>
         <h2 style="font-size:23px;font-weight:700;margin-top:4px">${esc(o.navn)}</h2>
         ${o.kort ? `<p class="muted" style="margin-top:6px">${esc(o.kort)}</p>` : ''}
       </div>
@@ -64,7 +64,7 @@ export function visOpskrift(id, { portioner, faktor = 1 } = {}) {
       <p class="finprint">${tal(m.fib * faktor, 1)} g fibre pr. portion${faktor !== 1 ? ` · portionen er skaleret ${tal(faktor, 2)}×, så dagen rammer dit mål` : ''}</p>
 
       <div>
-        <div class="blok-hoved"><h3 style="font-size:16px">Ingredienser</h3><span class="finprint">${pers} ${pers === 1 ? 'portion' : 'portioner'}</span></div>
+        <div class="blok-hoved"><h3 style="font-size:16px">${o.ude ? 'Sådan ser en portion ud' : 'Ingredienser'}</h3><span class="finprint">${o.ude ? 'skøn, ikke opskrift' : `${pers} ${pers === 1 ? 'portion' : 'portioner'}`}</span></div>
         <ul class="ingredienser">
           ${o.ing.map(([n, q]) => {
             const v = VARER[n];
@@ -78,11 +78,12 @@ export function visOpskrift(id, { portioner, faktor = 1 } = {}) {
       </div>
 
       <div>
-        <h3 style="font-size:16px;margin-bottom:12px">Sådan gør du</h3>
+        <h3 style="font-size:16px;margin-bottom:12px">${o.ude ? `Sådan gør du ved ${esc((o.sted || 'buffeten').toLowerCase())}` : 'Sådan gør du'}</h3>
         <ol class="fremgang">${o.fremgang.map(f => `<li><span>${esc(f)}</span></li>`).join('')}</ol>
       </div>
 
       ${o.tip ? `<p class="tip">💡 ${esc(o.tip)}</p>` : ''}
+      ${o.ude ? `<p class="finprint">Måltidet står ikke på indkøbslisten — du får det serveret. Tallene er et skøn på en normal portion, så ugen kan regnes sammen.</p>` : ''}
 
       <div class="knap-gruppe">
         <button class="knap sek" data-favorit="${o.id}">${erFavorit(o.id) ? '♥ Favorit' : '♡ Gem som favorit'}</button>

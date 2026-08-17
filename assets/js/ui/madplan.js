@@ -118,14 +118,14 @@ function slotKort(s, dagIndex, slotIndex, dag) {
     <button class="maaltid" data-ret="${o.id}" data-faktor="${f}">
       <div class="billede">${madSvg(o, { b: 200, h: 200 })}</div>
       <div class="krop">
-        <span class="slot">${kategoriNavn(s.slot)}${s.rester ? ' · rester fra i går' : ''}</span>
+        <span class="slot">${kategoriNavn(s.slot)}${o.ude ? ` · ${esc(o.sted || 'ude')}` : (s.rester ? ' · rester fra i går' : '')}</span>
         <h4>${esc(o.navn)}${erFavorit(o.id) ? ' <span class="hjerte">♥</span>' : ''}</h4>
-        <p class="meta"><span class="tal">${tal(m.kcal * f)} kcal</span><span class="tal">${tal(m.p * f)} g protein</span><span>${o.tid} min</span></p>
+        <p class="meta"><span class="tal">${tal(m.kcal * f)} kcal</span><span class="tal">${tal(m.p * f)} g protein</span>${o.ude ? '' : `<span>${o.tid} min</span>`}</p>
       </div>
     </button>
     <div class="kort-handling">
       <button class="rund" data-byt="${dagIndex}:${slotIndex}" title="Byt til en anden ret" aria-label="Byt ${esc(o.navn)} ud">↻</button>
-      ${s.slot === 'aftensmad' ? `<button class="rund tekst-knap" data-fleks="${dagIndex}:${slotIndex}" title="Gør aftenen fri — spis ude" aria-label="Gør aftenen fri">ude</button>` : ''}
+      ${s.slot === 'aftensmad' ? `<button class="rund tekst-knap" data-fleks="${dagIndex}:${slotIndex}" title="Gør aftenen fri — spis ude eller bestil" aria-label="Gør aftenen fri">fri</button>` : ''}
     </div>
   </div>`;
 }

@@ -89,6 +89,12 @@ export function html() {
           <select data-valg="snacks">${[0, 1, 2].map(n => `<option value="${n}" ${v.snacks == n ? 'selected' : ''}>${n}</option>`).join('')}</select>
         </label>
       </div>
+      <div>
+        <p class="label" style="margin-bottom:4px">Måltider du får serveret i hverdagen</p>
+        <p class="finprint" style="margin-bottom:8px">Kantine, buffet eller salatbar mandag til fredag. De tæller med i dine kalorier og makroer, men kommer aldrig på indkøbslisten.</p>
+        <label class="skifter"><span>Morgenmad får jeg ude (man-fre)</span><input type="checkbox" data-valg="udeMorgenmad" ${v.udeMorgenmad ? 'checked' : ''}></label>
+        <label class="skifter"><span>Frokost får jeg ude (man-fre)</span><input type="checkbox" data-valg="udeFrokost" ${v.udeFrokost ? 'checked' : ''}></label>
+      </div>
       <label class="skifter"><span>Genbrug aftensmad som frokost dagen efter</span><input type="checkbox" data-valg="rester" ${v.rester ? 'checked' : ''}></label>
       <label class="skifter"><span>Én fri aften om ugen</span><input type="checkbox" data-valg="fleksAften" ${v.fleksAften ? 'checked' : ''}></label>
       ${v.fleksAften ? `<label class="felt"><span>Hvilken dag skal være fri?</span>
