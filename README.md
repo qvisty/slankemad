@@ -1,18 +1,38 @@
 # Slankemad
 
-**Madplan og indkøbsliste til fedttab — med styrketræning, ikke i stedet for den.**
+**Træningsoverblik og madplan til fedttab — med styrketræning, ikke i stedet for den.**
 
-En lille, hurtig webapp der hver uge laver en madplan og en samlet indkøbsliste
-til REMA 1000. Den er bygget til ét bestemt formål: at tabe kropsfedt (og dermed
-også mavefedt) uden at tabe muskelmasse, mens man træner BodyPump og tager
-kreatin — og uden at det føles som en kur.
+En lille, hurtig webapp med to hoveder, der ikke blandes:
+
+- **Træning** — dagens træning, ugeplanen, registrering og progression.
+- **Mad** — ugentlig madplan og en samlet indkøbsliste til REMA 1000.
+
+Begge dele tjener ét formål: at tabe kropsfedt uden at tabe muskelmasse, mens man
+træner BodyPump og tager kreatin — og uden at det føles som en kur.
 
 👉 **[Åbn appen](https://qvisty.github.io/slankemad/)** ·
 📈 **[Udviklingsstatus](https://qvisty.github.io/slankemad/progress.html)**
 
 ---
 
-## Hvad den gør
+## Træning
+
+| | |
+|---|---|
+| **I dag** | Dagens træning på to sekunder: ugedag, træning, varighed, intensitet, gåtur og status. Er den gennemført, vises resultatet frem for planen. |
+| **Ugen** | Mandag til søndag med status, og ugens balance mellem styrke, kondition og restitution — talt på det, du faktisk har registreret. |
+| **Træningsark** | Øvelser og intervaller i rigtig rækkefølge, med stregtegninger hvor startposition er svagt optrukket og slutposition fuldt optrukket. Sæt registreres et for et og gemmes med det samme. |
+| **Progression** | Regelbaserede forslag ud fra dine egne sæt: 15/15/15 armbøjninger to gange → sværere variant, 15 gentagelser row i alle sæt → øg vægten, alle intervaller gennemført tre gange → næste intervalniveau. Forslag ændrer aldrig planen af sig selv. |
+| **Historik** | Gennemførte træninger uge for uge. Tom ved første installation — der er intet lagt ind på forhånd. |
+
+Ingen tal opdigtes. Der beregnes hverken kalorier, puls, tempo, distance,
+kondital eller træningsbelastning. Findes et tal ikke, er feltet tomt.
+
+**Historikken kan ikke ændres bagud.** Hver gennemført træning gemmer et
+øjebliksbillede af skabelonen, så en senere ændring af planen ikke ændrer det,
+der faktisk blev trænet. Det er dækket af en test.
+
+## Mad
 
 | | |
 |---|---|
@@ -78,13 +98,24 @@ assets/js/
   app.js              Navigation og gentegning
   data/varer.js       Varekatalog: næring, afdeling, pakkestørrelse
   data/opskrifter.js  Opskrifter — kender kun varenøgler og mængder
+  data/traening.js    Ugeplan, øvelser, niveauer og progressionsregler
   data/guide.js       Guidetekster
   core/state.js       Brugerindstillinger og persistens (localStorage)
   core/ernaering.js   Næring pr. opskrift + daglige mål
-  core/plan.js        Plangeneratoren
+  core/plan.js        Madplangeneratoren
   core/indkob.js      Sammenlægning og gruppering af indkøb
+  core/traening.js    Sessioner, sæt, gåture, progression og nøgletal
+  core/rytme.js       Spisetider og placering af snacks
   ui/                 Én fil pr. skærm + delte komponenter
+tests/                Automatiserede tests (node --test)
+dev/gauntlet-status/  Udviklingsstatus for træningsdelen
 ```
+
+**Træningsmodellen er normaliseret** og navngivet, så den kan oversættes direkte
+til relationelle tabeller — `workout_template`, `exercise`, `training_day`,
+`template_level`, `progression_rule`, `workout_session`, `exercise_set`,
+`walk_session`. Skal der senere en Django-backend, en mobilapp eller import fra
+Garmin bagved, er det datalaget der skiftes ud, ikke skærmene.
 
 Lagene kender kun hinanden nedad. Et opskriftskort ved intet om, hvor
 næringstallene kommer fra, og `core/` ved intet om DOM. Skal varekataloget en dag
@@ -94,6 +125,18 @@ skærmene.
 **Madbillederne** er genereret SVG, tegnet ud fra rettens egne råvarer. Ingen
 eksterne billeder, ingen rettighedsproblemer, ingen ventetid på et CDN — og samme
 ret giver altid det samme billede.
+
+## Tests
+
+```bash
+npm test          # eller: node --test "tests/*.test.js"
+```
+
+27 tests dækker ugeplanen dag for dag, registrering af træning og sæt, gåture som
+separat registrering, at historik ikke ændres når skabelonen ændres, alle
+progressionsregler, at progression aldrig sker automatisk, og at nøgletal kun
+beregnes på faktiske data. De køres også i deployment-workflowet før hver
+udgivelse.
 
 ## Kør lokalt
 

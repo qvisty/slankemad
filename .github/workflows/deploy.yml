@@ -33,8 +33,11 @@ jobs:
             node --check "$f"
           done
 
+      - name: Kør tests
+        run: node --test "tests/*.test.js"
+
       - name: Tjek at alle sider findes
-        run: test -f index.html && test -f progress.html
+        run: test -f index.html && test -f progress.html && test -f dev/gauntlet-status/index.html
 
       # Pages skal være slået til én gang under Settings → Pages med
       # "Source: GitHub Actions". Workflowet kan ikke slå det til selv —
