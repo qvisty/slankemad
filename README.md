@@ -45,8 +45,19 @@ der faktisk blev trænet. Det er dækket af en test.
 | **Oversigt** | Gennemsnitlige kalorier og makroer pr. dag, antal måltider, tid i køkkenet, fordeling af hurtige vs. længere retter og status på fedttabet. |
 | **Fremskridt** | Log vægt og taljemål. Taljen får sin egen graf, fordi kreatin binder vand og gør vægten upålidelig de første uger. |
 
-Appen kører 100 % i browseren. Ingen konto, ingen server, ingen data der forlader
-din maskine — alt gemmes i `localStorage`.
+## Data
+
+Appen kører i browseren og virker helt uden konto — alt gemmes i `localStorage`.
+
+Vil du have dine data med på flere enheder, kan du koble en gratis
+[Supabase](https://supabase.com)-database på: se
+[docs/opsaetning.md](docs/opsaetning.md). Så bliver browseren stadig
+arbejdskopien, og data synkroniseres post for post, hvor nyeste ændring vinder.
+Uden opsætning vises synkroniseringen slet ikke.
+
+Databasen har Row Level Security på alle tabeller: uden gyldigt login kan der
+hverken læses eller skrives en eneste række — heller ikke med den offentlige
+anon-nøgle, der ligger i frontend.
 
 ## Ernæringsprincipperne
 
@@ -106,8 +117,12 @@ assets/js/
   core/indkob.js      Sammenlægning og gruppering af indkøb
   core/traening.js    Sessioner, sæt, gåture, progression og nøgletal
   core/rytme.js       Spisetider og placering af snacks
+  core/sky.js         Login og synkronisering mod Supabase (valgfri)
+  data/sky-config.js  Adressen på din database — tom som standard
   ui/                 Én fil pr. skærm + delte komponenter
 tests/                Automatiserede tests (node --test)
+supabase/migrations/  Databaseskema med Row Level Security
+docs/                 Opsætningsvejledning og arbejdsmetode
 dev/gauntlet-status/  Udviklingsstatus for træningsdelen
 ```
 

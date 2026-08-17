@@ -190,11 +190,15 @@ export function sikrSession(tilstand, dato) {
     vaegte: {},
     intervaller: null,
     saet: [],
-    snapshot: oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id))
+    snapshot: oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id)),
+    opdateret: new Date().toISOString()
   };
   tilstand.traening.sessioner = [...(tilstand.traening.sessioner || []), s];
   return s;
 }
+
+/** Stempler en post, så synkroniseringen kan afgøre hvad der er nyest. */
+const stempl = o => { o.opdateret = new Date().toISOString(); return o; };
 
 export function saetStatus(tilstand, dato, status, naa = new Date()) {
   if (!Object.values(STATUS).includes(status)) return null;
@@ -208,6 +212,7 @@ export function saetStatus(tilstand, dato, status, naa = new Date()) {
     const plan = planFor(dato);
     s.snapshot = oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id));
   }
+  stempl(s);
   // Varigheden opfindes ikke. Er den ikke tastet ind, er den tom — planens tal
   // står som placeholder i formularen, men bliver aldrig til registreret data.
   return s;
@@ -241,6 +246,7 @@ export function gemSession(tilstand, dato, felter = {}) {
     }
   }
   if (s.note == null) s.note = '';
+  stempl(s);
   return s;
 }
 
@@ -290,6 +296,7 @@ export function gemSaet(tilstand, dato, oevelseId, saetNr, vaerdier = {}) {
     // statistikken, fordi kun gennemførte træninger tælles med.
     if (s.status === STATUS.planlagt) s.status = STATUS.igang;
   }
+  stempl(s);
   s.saet.sort((a, b) => a.oevelseId.localeCompare(b.oevelseId) || a.saetNr - b.saetNr);
   return post;
 }
@@ -307,7 +314,9 @@ export const gaaturFor = (tilstand, dato) =>
 export function gemGaatur(tilstand, dato, minutter, note = '') {
   const liste = (tilstand.traening.gaature || []).filter(g => g.dato !== dato);
   const m = Number(minutter);
-  if (Number.isFinite(m) && m > 0) liste.push({ dato, minutter: Math.round(m), note });
+  if (Number.isFinite(m) && m > 0) {
+    liste.push({ dato, minutter: Math.round(m), note, opdateret: new Date().toISOString() });
+  }
   tilstand.traening.gaature = liste.sort((a, b) => a.dato.localeCompare(b.dato));
   return gaaturFor(tilstand, dato);
 }

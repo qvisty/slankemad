@@ -11,6 +11,8 @@
 import { hent, opdater, abonner } from './core/state.js';
 import { lavPlan } from './core/plan.js';
 import * as tr from './core/traening.js';
+import * as sky from './core/sky.js';
+import { skyErOpsat } from './data/sky-config.js';
 import { saetTegner, saetSkifter } from './ui/bus.js';
 import { $, toast, skjulToast } from './ui/format.js';
 import * as dashboard from './ui/dashboard.js';
@@ -152,7 +154,12 @@ function bindFaelles(rod) {
   }));
 }
 
-function start() {
+async function start() {
+  // Kommer man tilbage fra login-linket, ligger tokenet i adressen.
+  if (skyErOpsat() && sky.fangLoginFraUrl()) {
+    try { await sky.hentBruger(); } catch { /* vises i grænsefladen */ }
+  }
+
   window.addEventListener('hashchange', () => {
     const id = location.hash.slice(1);
     if (findSide(id) && id !== aktivSide) skiftTil(id);
@@ -169,6 +176,12 @@ function start() {
     aktivSektion = side.sektion;
   }
   tegn();
+
+  // Hent ændringer fra andre enheder i baggrunden. Fejler det, mærker man
+  // ingenting — appen kører videre på den lokale kopi.
+  if (skyErOpsat() && sky.erLoggetInd()) {
+    sky.synkroniser().then(() => tegn()).catch(() => {});
+  }
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

@@ -9,6 +9,8 @@ import { GUIDE } from '../data/guide.js';
 import { linjegraf } from './graf.js';
 import { tal, esc, idag, toast } from './format.js';
 import { tegn } from './bus.js';
+import * as sky from '../core/sky.js';
+import { skyErOpsat } from '../data/sky-config.js';
 
 /** Grænser der holder beregningen meningsfuld — og advarer i stedet for at regne videre på vrøvl. */
 const GRAENSER = {
@@ -139,6 +141,8 @@ export function html() {
     </div>
   </section>
 
+  ${synkAfsnit()}
+
   <section class="blok">
     <div class="blok-hoved"><h2>Om appen</h2></div>
     <div class="kort" style="display:grid;gap:10px">
@@ -185,6 +189,38 @@ function maalBoks() {
     <p class="finprint">Beregnet med Mifflin-St Jeor plus dit aktivitetsniveau og ${t.profil.traening} Bodypump-timer. Proteinmålet regnes af ${tal(m.proteinVaegt)} kg — din målvægt, ikke din nuværende vægt, fordi fedtvæv ikke har et proteinbehov.</p>
     <p class="finprint">Tidshorisonten er en lige linje. I virkeligheden falder dit forbrug i takt med vægten, så regn med 15-25 % længere. Justér efter, hvad vægten og taljen faktisk gør over 3-4 uger.</p>
   </div>`;
+}
+
+/** Synkronisering vises kun, hvis den overhovedet er sat op. */
+function synkAfsnit() {
+  if (!skyErOpsat()) return '';
+  const st = sky.status();
+  return `
+  <section class="blok">
+    <div class="blok-hoved"><h2>Synkronisering</h2></div>
+    <div class="kort felter">
+      ${st.loggetInd ? `
+        <div>
+          <p style="font-weight:650">${esc(st.epost || 'Logget ind')}</p>
+          <p class="finprint">${st.sidsteSync
+            ? `Sidst synkroniseret ${new Date(st.sidsteSync).toLocaleString('da-DK')}`
+            : 'Endnu ikke synkroniseret'}</p>
+        </div>
+        <div class="knap-gruppe">
+          <button class="knap" data-synk>Synkronisér nu</button>
+          <button class="knap tekst" data-logud>Log ud</button>
+        </div>
+        <p class="finprint">Dine data ligger både i browseren og i din egen database. Nyeste ændring vinder, post for post — så du kan registrere på telefonen og se det på computeren.</p>`
+      : `
+        <p class="finprint">Log ind for at få dine træninger og målinger med over på telefonen. Du får et engangslink på mail — der er ingen adgangskode at huske.</p>
+        <label class="felt"><span>E-mail</span>
+          <input type="email" data-epost placeholder="dig@eksempel.dk" autocomplete="email">
+        </label>
+        <button class="knap bred" data-sendlogin>Send mig et login-link</button>
+        <p class="finprint">Uden login virker appen præcis som nu — alt bliver liggende i denne browser.</p>`}
+      <p class="finprint" data-synkstatus></p>
+    </div>
+  </section>`;
 }
 
 function fremskridt() {
@@ -278,7 +314,8 @@ export function bind(rod) {
     const talje = f.get('log-talje') ? Number(f.get('log-talje')) : null;
     if (!dato || (vaegt == null && talje == null)) { toast('Udfyld vægt eller talje'); return; }
     opdater(t => {
-      t.log = [...t.log.filter(l => l.dato !== dato), { dato, vaegt, talje }];
+      t.log = [...t.log.filter(l => l.dato !== dato),
+        { dato, vaegt, talje, opdateret: new Date().toISOString() }];
       if (vaegt != null) t.profil.vaegt = vaegt;
     });
     toast('Måling gemt');
@@ -287,6 +324,44 @@ export function bind(rod) {
   rod.querySelectorAll('[data-slet]').forEach(b => b.addEventListener('click', () => {
     opdater(t => { t.log = t.log.filter(l => l.dato !== b.dataset.slet); });
   }));
+
+  const vis = besked => {
+    const el = rod.querySelector('[data-synkstatus]');
+    if (el) el.textContent = besked;
+  };
+
+  rod.querySelector('[data-sendlogin]')?.addEventListener('click', async () => {
+    const felt = rod.querySelector('[data-epost]');
+    const epost = felt?.value?.trim();
+    if (!epost || !epost.includes('@')) { vis('Skriv din e-mail først.'); return; }
+    vis('Sender …');
+    try {
+      await sky.sendLogin(epost);
+      vis('Tjek din mail — linket gælder i en time.');
+    } catch (e) {
+      vis(`Kunne ikke sende linket: ${e.message}`);
+    }
+  });
+
+  rod.querySelector('[data-synk]')?.addEventListener('click', async e => {
+    e.currentTarget.disabled = true;
+    vis('Synkroniserer …');
+    try {
+      const r = await sky.synkroniser();
+      vis(`Færdig. ${r.op} sendt, ${r.ned} hentet.`);
+      toast('Synkroniseret');
+    } catch (err) {
+      vis(`Kunne ikke synkronisere: ${err.message}`);
+    } finally {
+      e.currentTarget.disabled = false;
+    }
+  });
+
+  rod.querySelector('[data-logud]')?.addEventListener('click', () => {
+    sky.logUd();
+    toast('Logget ud');
+    tegn();
+  });
 
   rod.querySelector('[data-handling="nulstil"]')?.addEventListener('click', () => {
     if (!confirm('Nulstil alt — dine tal, planen og alle målinger?')) return;
