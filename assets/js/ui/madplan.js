@@ -4,7 +4,7 @@
 
 import { hent, opdater, erFavorit, gemPlan } from '../core/state.js';
 import { makro, OPSKRIFT_INDEX, beregnMaal } from '../core/ernaering.js';
-import { dagensTal, regenererDag, bytRet, skiftFleks, lavPlan, slotFaktor } from '../core/plan.js';
+import { dagensTal, regenererDag, bytRet, skiftFleks, lavPlan, slotFaktor, valgFingeraftryk } from '../core/plan.js';
 import { madSvg } from './billede.js';
 import { visOpskrift, kategoriNavn } from './opskriftsark.js';
 import { tal, esc, minutter, toast } from './format.js';
@@ -33,7 +33,14 @@ export function html() {
   const d = dagensTal(dag);
   const proteinPct = Math.min(100, (d.p / Math.max(1, maal.protein)) * 100);
 
+  const forael = plan.valgSum && plan.valgSum !== valgFingeraftryk(t.valg);
+
   return `
+  ${forael ? `<div class="advarsel" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <span>Planen her er lavet efter andre indstillinger, end du har nu. Lav en ny, hvis den skal følge dine valg.</span>
+      <button class="knap lille" data-handling="ny-uge">Lav en ny plan</button>
+    </div>` : ''}
+
   <div class="dagsstribe" role="tablist" aria-label="Vælg dag">
     ${plan.dage.map((x, i) => {
       const tt = dagensTal(x);

@@ -600,16 +600,16 @@ export const OPSKRIFTER = [
     tip: 'Er der kun én ting, du gør ved buffeten, så er det at tage skyren først og brødet bagefter.'
   },
   {
-    id: 'u-rugbrod', navn: 'Rugbrød med æg og ost', kategori: 'morgenmad',
-    ude: true, sted: 'Buffeten', tid: 3, basis: 1, tags: ['ude', 'lyn'],
-    kort: 'Når du er træt af skyr — men stadig skal have protein med.',
-    ing: [['rugbrod', 80], ['aeg', 2], ['ost', 25], ['agurk', 60]],
+    id: 'u-skyr-aeg', navn: 'Skyr med bær og et blødkogt æg', kategori: 'morgenmad',
+    ude: true, sted: 'Buffeten', tid: 3, basis: 1, tags: ['ude', 'lyn', 'favorit'],
+    kort: 'Samme skyr som ellers — men med et æg ved siden af bliver den mættende hele formiddagen.',
+    ing: [['skyr', 300], ['blaabaer', 60], ['havregryn', 25], ['aeg', 1]],
     fremgang: [
-      'To skiver rugbrød — ikke lyst brød, hvis der er valgmulighed.',
-      'Æg på den ene, ost på den anden. Æggene er dem, der gør, at du ikke er sulten klokken ti.',
-      'Agurk eller tomat ved siden af.'
+      'Fyld skålen halvt op med skyr, før du tager noget andet.',
+      'Bær og et par spiseskefulde havregryn ovenpå.',
+      'Tag et blødkogt æg ved siden af. Det er de 6 gram protein, der gør, at du ikke er sulten klokken ti.'
     ],
-    tip: 'Ost er ikke problemet — mængden er. En skive pr. mad, ikke tre.'
+    tip: 'Ægget er det billigste protein på hele buffeten — og det, der gør forskellen på at holde til frokost eller ej.'
   },
   {
     id: 'u-salatbar-kylling', navn: 'Salatbar med kylling og kikærter', kategori: 'frokost',

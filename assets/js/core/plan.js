@@ -282,6 +282,24 @@ export function traeningsdage(antal) {
   return moenstre[Math.max(0, Math.min(6, Number(antal) || 0))] || [0, 2, 4];
 }
 
+/**
+ * Et fingeraftryk af de valg, planen blev bygget efter. Ændrer man fx til at
+ * få morgenmad serveret i hverdagen, ændrer den gemte plan sig ikke af sig
+ * selv — og så skal appen sige det i stedet for at lade som ingenting.
+ */
+export function valgFingeraftryk(valg) {
+  const relevante = [
+    'personer', 'dage', 'morgenmad', 'frokost', 'aftensmad', 'snacks', 'maxTid',
+    'rester', 'udeMorgenmad', 'udeFrokost', 'fleksAften', 'fleksDag'
+  ].map(n => `${n}=${valg[n]}`).join('|') + `|undgaa=${[...(valg.undgaa || [])].sort().join(',')}`;
+  let h = 2166136261;
+  for (let i = 0; i < relevante.length; i++) {
+    h ^= relevante.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36);
+}
+
 /** Bygger en helt ny plan. */
 export function lavPlan(tilstand) {
   const antalDage = Math.max(1, Math.min(7, Number(tilstand.valg.dage) || 7));
@@ -300,7 +318,7 @@ export function lavPlan(tilstand) {
     dage.push(dag);
   }
 
-  return { lavet: new Date().toISOString(), dage };
+  return { lavet: new Date().toISOString(), valgSum: valgFingeraftryk(tilstand.valg), dage };
 }
 
 /** Bygger én dag om — resten af ugen holdes fast og bruges som kontekst. */
