@@ -3,6 +3,7 @@
  */
 
 import { hent, opdater, nulstil } from '../core/state.js';
+import { stempel } from '../core/tid.js';
 import { beregnMaal } from '../core/ernaering.js';
 import { MARKORER } from '../data/varer.js';
 import { GUIDE } from '../data/guide.js';
@@ -206,9 +207,16 @@ function synkAfsnit() {
             ? `Sidst synkroniseret ${new Date(st.sidsteSync).toLocaleString('da-DK')}`
             : 'Endnu ikke synkroniseret'}</p>
         </div>
+        ${st.bekraeftet ? '' : `<div class="advarsel" style="display:grid;gap:10px">
+          <span>Du blev logget ind fra et link, som denne enhed ikke selv bad om. Det er helt normalt, hvis du åbnede mailen på en anden enhed — men se lige efter, at kontoen ovenfor er din, før der sendes data.</span>
+          <div class="knap-gruppe">
+            <button class="knap lille" data-bekraeft>Ja, kontoen er min</button>
+            <button class="knap sek lille" data-logud>Nej, log ud</button>
+          </div>
+        </div>`}
         <div class="knap-gruppe">
-          <button class="knap" data-synk>Synkronisér nu</button>
-          <button class="knap tekst" data-logud>Log ud</button>
+          <button class="knap" data-synk ${st.bekraeftet ? '' : 'disabled'}>Synkronisér nu</button>
+          ${st.bekraeftet ? '<button class="knap tekst" data-logud>Log ud</button>' : ''}
         </div>
         <p class="finprint">Dine data ligger både i browseren og i din egen database. Nyeste ændring vinder, post for post — så du kan registrere på telefonen og se det på computeren.</p>`
       : `
@@ -224,7 +232,7 @@ function synkAfsnit() {
 }
 
 function fremskridt() {
-  const log = [...hent().log].sort((a, b) => a.dato.localeCompare(b.dato));
+  const log = hent().log.filter(l => !l.slettet).sort((a, b) => a.dato.localeCompare(b.dato));
   if (!log.length) {
     return `<div class="kort"><p class="finprint">Ingen målinger endnu. Den første måling er dit nulpunkt — og med kreatin i blandingen er taljen det ærligste tal at følge.</p></div>`;
   }
@@ -315,14 +323,22 @@ export function bind(rod) {
     if (!dato || (vaegt == null && talje == null)) { toast('Udfyld vægt eller talje'); return; }
     opdater(t => {
       t.log = [...t.log.filter(l => l.dato !== dato),
-        { dato, vaegt, talje, opdateret: new Date().toISOString() }];
+        { dato, vaegt, talje, opdateret: stempel(t.log.find(l => l.dato === dato)?.opdateret) }]
+        .sort((a, b) => a.dato.localeCompare(b.dato));
       if (vaegt != null) t.profil.vaegt = vaegt;
     });
     toast('Måling gemt');
   });
 
   rod.querySelectorAll('[data-slet]').forEach(b => b.addEventListener('click', () => {
-    opdater(t => { t.log = t.log.filter(l => l.dato !== b.dataset.slet); });
+    // Gravsten, ikke fjernelse. Ellers henter synkroniseringen målingen tilbage
+    // fra serveren, fordi den anden enhed ikke kan vide, at den blev slettet.
+    opdater(t => {
+      const nu = stempel(t.log.find(l => l.dato === b.dataset.slet)?.opdateret);
+      t.log = [...t.log.filter(l => l.dato !== b.dataset.slet),
+        { dato: b.dataset.slet, vaegt: null, talje: null, slettet: nu, opdateret: nu }]
+        .sort((a, b2) => a.dato.localeCompare(b2.dato));
+    });
   }));
 
   const vis = besked => {
@@ -348,8 +364,8 @@ export function bind(rod) {
     vis('Synkroniserer …');
     try {
       const r = await sky.synkroniser();
-      vis(r.konflikt
-        ? `Færdig. ${r.op} sendt, ${r.ned} hentet. Dine indstillinger var ændret begge steder — denne enheds version blev beholdt.`
+      vis(r.konflikt?.length
+        ? `Færdig. ${r.op} sendt, ${r.ned} hentet. ${r.konflikt.join(' og ')} var ændret begge steder — denne enheds version blev beholdt. Resten er flettet sammen.`
         : `Færdig. ${r.op} sendt, ${r.ned} hentet.`);
       toast('Synkroniseret');
     } catch (err) {
@@ -359,14 +375,33 @@ export function bind(rod) {
     }
   });
 
-  rod.querySelector('[data-logud]')?.addEventListener('click', () => {
-    sky.logUd();
-    toast('Logget ud');
+  rod.querySelector('[data-bekraeft]')?.addEventListener('click', () => {
+    sky.bekraeftKonto();
+    toast('Kontoen er bekræftet');
     tegn();
   });
 
-  rod.querySelector('[data-handling="nulstil"]')?.addEventListener('click', () => {
-    if (!confirm('Nulstil alt — dine tal, planen og alle målinger?')) return;
+  rod.querySelectorAll('[data-logud]').forEach(b => b.addEventListener('click', async () => {
+    await sky.logUd();
+    toast('Logget ud');
+    tegn();
+  }));
+
+  rod.querySelector('[data-handling="nulstil"]')?.addEventListener('click', async () => {
+    const iSkyen = skyErOpsat() && sky.status().loggetInd && sky.status().bekraeftet;
+    if (!confirm(iSkyen
+      ? 'Nulstil alt — dine tal, planen og alle målinger? Det slettes også i databasen, så andre enheder mister det ved næste synkronisering.'
+      : 'Nulstil alt — dine tal, planen og alle målinger?')) return;
+    if (iSkyen) {
+      // Først i skyen. Går det galt, får brugeren besked i stedet for at stå med
+      // en tom browser og en fuld database, der sender det hele tilbage.
+      try {
+        await sky.sletAltISkyen();
+      } catch (e) {
+        toast(`Kunne ikke slette i databasen: ${e.message}`);
+        return;
+      }
+    }
     nulstil();
     toast('Alt er nulstillet');
   });

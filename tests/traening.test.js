@@ -133,15 +133,17 @@ test('øvelsessæt gemmes, opdateres og kan fjernes igen', () => {
   t.gemSaet(st, dag(4), 'armboejninger', 1, { gentagelser: 12 });
   t.gemSaet(st, dag(4), 'armboejninger', 2, { gentagelser: 10 });
   let s = t.sessionFor(st, dag(4));
-  assert.equal(s.saet.length, 2);
+  assert.equal(t.saetListe(s).length, 2);
   assert.equal(t.saetFor(s, 'armboejninger', 1).gentagelser, 12);
 
   t.gemSaet(st, dag(4), 'armboejninger', 1, { gentagelser: 14 });
   assert.equal(t.saetFor(t.sessionFor(st, dag(4)), 'armboejninger', 1).gentagelser, 14);
-  assert.equal(t.sessionFor(st, dag(4)).saet.length, 2, 'et opdateret sæt må ikke blive til to');
+  assert.equal(t.saetListe(t.sessionFor(st, dag(4))).length, 2, 'et opdateret sæt må ikke blive til to');
 
   t.gemSaet(st, dag(4), 'armboejninger', 2, { gentagelser: '' });
-  assert.equal(t.sessionFor(st, dag(4)).saet.length, 1, 'et tømt felt gemmes ikke som nul');
+  assert.equal(t.saetListe(t.sessionFor(st, dag(4))).length, 1, 'et tømt felt gemmes ikke som nul');
+  assert.ok(t.sessionFor(st, dag(4)).saet.some(x => x.oevelseId === 'armboejninger' && x.saetNr === 2 && x.slettet),
+    'det fjernede sæt efterlader en gravsten, så sletningen kan synkroniseres');
 });
 
 test('row registrerer både vægt og gentagelser', () => {
@@ -430,7 +432,44 @@ test('ugen begynder mandag, uanset hvilken dag man kigger på', () => {
 test('sessioner er knyttet til dato, ikke til ugedag', () => {
   const st = nyTilstand();
   t.saetStatus(st, dag(0), t.STATUS.gennemfoert);
-  t.saetStatus(st, t.laegTil(MANDAG, -7), t.STATUS.planlagt);
+  t.saetStatus(st, t.laegTil(MANDAG, -7), t.STATUS.sprunget);
   assert.equal(t.sessionFor(st, dag(0)).status, 'gennemfoert');
-  assert.equal(t.sessionFor(st, t.laegTil(MANDAG, -7)).status, 'planlagt');
+  assert.equal(t.sessionFor(st, t.laegTil(MANDAG, -7)).status, 'sprunget');
+});
+
+test('at markere en urørt dag som planlagt opretter ingenting', () => {
+  const st = nyTilstand();
+  assert.equal(t.saetStatus(st, dag(1), t.STATUS.planlagt), null);
+  assert.equal(t.sessionFor(st, dag(1)), null,
+    'en tom session med friskt stempel ville kunne overskrive en rigtig registrering fra en anden enhed');
+
+  // En dag, der ER registreret, kan naturligvis sættes tilbage til planlagt.
+  t.saetStatus(st, dag(1), t.STATUS.gennemfoert);
+  t.saetStatus(st, dag(1), t.STATUS.planlagt);
+  assert.equal(t.sessionFor(st, dag(1)).status, 'planlagt');
+});
+
+test('en gåtur på nul minutter efterlader en gravsten', () => {
+  const st = nyTilstand();
+  t.gemGaatur(st, dag(0), 45);
+  assert.equal(t.gaaturFor(st, dag(0)).minutter, 45);
+  t.gemGaatur(st, dag(0), 0);
+  assert.equal(t.gaaturFor(st, dag(0)), null, 'gåturen er væk for brugeren');
+  assert.ok(st.traening.gaature.find(g => g.dato === dag(0))?.slettet,
+    'men gravstenen bliver, så sletningen når den anden enhed');
+});
+
+test('to ændringer i samme millisekund får ikke samme stempel', () => {
+  const st = nyTilstand();
+  t.gemGaatur(st, dag(0), 45);
+  const foerste = st.traening.gaature[0].opdateret;
+  t.gemGaatur(st, dag(0), 0);
+  const anden = st.traening.gaature[0].opdateret;
+  assert.ok(Date.parse(anden) > Date.parse(foerste),
+    'ellers ser fortrydelsen lige gammel ud som registreringen, og bliver aldrig synkroniseret');
+
+  t.saetStatus(st, dag(0), t.STATUS.gennemfoert);
+  const s1 = t.sessionFor(st, dag(0)).opdateret;
+  t.saetStatus(st, dag(0), t.STATUS.sprunget);
+  assert.ok(Date.parse(t.sessionFor(st, dag(0)).opdateret) > Date.parse(s1));
 });

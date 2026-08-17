@@ -210,7 +210,7 @@ const sidsteVaerdi = (sidste, oevelseId, nr, felt) => {
 };
 
 function sidstTekst(sidste, o) {
-  const saet = (sidste.saet || []).filter(x => x.oevelseId === o.id);
+  const saet = tr.saetListe(sidste).filter(x => x.oevelseId === o.id);
   if (!saet.length) return '';
   const tekst = saet
     .sort((a, b) => a.saetNr - b.saetNr)

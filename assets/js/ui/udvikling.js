@@ -121,7 +121,7 @@ export const historik = {
     return [...uger.entries()].map(([mandag, liste]) => {
       const gennemfoert = liste.filter(s => s.status === 'gennemfoert').length;
       const minutter = liste.reduce((a, s) => a + (s.varighed || 0), 0);
-      const gaa = (t.traening.gaature || []).filter(g => tr.mandagI(g.dato) === mandag);
+      const gaa = tr.gaature(t).filter(g => tr.mandagI(g.dato) === mandag);
       return `
       <section class="blok">
         <div class="blok-hoved">
@@ -150,7 +150,7 @@ function post(s) {
   if (Number.isFinite(s.varighed)) dele.push(`${s.varighed} min`);
   if (s.intensitet) dele.push(INTENSITETER[s.intensitet]?.navn || s.intensitet);
   if (Number.isFinite(s.intervaller)) dele.push(`${s.intervaller} intervaller`);
-  const saet = (s.saet || []).length;
+  const saet = tr.saetListe(s).length;
   if (saet) dele.push(`${saet} sæt`);
 
   return `<button class="liste-raekke" data-aabn="${s.dato}">

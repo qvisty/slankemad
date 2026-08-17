@@ -147,7 +147,7 @@ function resultat(session, vis) {
   if (session.intensitet) dele.push(INTENSITETER[session.intensitet]?.navn || session.intensitet);
   if (Number.isFinite(session.intervaller)) dele.push(`${session.intervaller} intervaller`);
   const vaegte = Object.entries(session.vaegte || {}).filter(([, v]) => Number.isFinite(Number(v)));
-  const saet = (session.saet || []).length;
+  const saet = tr.saetListe(session).length;
 
   return `<div class="resultat">
     <p class="label">Sådan gik det${vis?.niveauNavn ? ` · ${esc(vis.niveauNavn)}` : ''}</p>
@@ -164,7 +164,7 @@ function resultat(session, vis) {
 /** De faktiske sæt, så tallene ikke forsvinder efter man har tastet dem ind. */
 function saetOpsummering(session) {
   const efterOevelse = new Map();
-  for (const x of session.saet || []) {
+  for (const x of tr.saetListe(session)) {
     if (!efterOevelse.has(x.oevelseId)) efterOevelse.set(x.oevelseId, []);
     efterOevelse.get(x.oevelseId).push(x);
   }

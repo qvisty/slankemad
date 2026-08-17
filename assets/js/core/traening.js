@@ -12,6 +12,7 @@
  */
 
 import { SKABELON_INDEX, UGEPLAN, OEVELSE_INDEX, REGLER, INTENSITETER } from '../data/traening.js';
+import { stempel } from './tid.js';
 
 const INTENSITET_IDER = Object.keys(INTENSITETER);
 
@@ -109,6 +110,8 @@ export function saetNiveau(tilstand, skabelonId, niveauId) {
     if (sess.skabelonId !== skabelonId) continue;
     if (sess.status === STATUS.gennemfoert || sess.status === STATUS.sprunget) continue;
     sess.snapshot = oejebliksbillede(s, aktivtNiveau(tilstand, skabelonId));
+    // Uden stempel når ændringen aldrig den anden enhed.
+    if (sess.opdateret) stempl(sess);
   }
   return true;
 }
@@ -169,10 +172,21 @@ export function visning(tilstand, dato) {
   return oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id));
 }
 
-export const sessionFor = (tilstand, dato) =>
-  (tilstand.traening?.sessioner || []).find(s => s.dato === dato) || null;
+/** De sessioner, der findes. Gravsten fra slettede dage tælles ikke med. */
+export const sessioner = tilstand =>
+  (tilstand.traening?.sessioner || []).filter(s => !s.slettet);
 
-/** Opretter sessionen, hvis den ikke findes. Returnerer den. */
+export const sessionFor = (tilstand, dato) =>
+  sessioner(tilstand).find(s => s.dato === dato) || null;
+
+/**
+ * Opretter sessionen, hvis den ikke findes. Returnerer den.
+ *
+ * Den nye session får med vilje INTET `opdateret`. En tom session er ikke en
+ * ændring, brugeren har lavet — den er bare en skuffe, der er slået op. Fik den
+ * et friskt stempel, ville en ny telefon kunne overskrive en færdigregistreret
+ * træning fra computeren, blot fordi skuffen blev åbnet senere.
+ */
 export function sikrSession(tilstand, dato) {
   let s = sessionFor(tilstand, dato);
   if (s) return s;
@@ -190,19 +204,36 @@ export function sikrSession(tilstand, dato) {
     vaegte: {},
     intervaller: null,
     saet: [],
-    snapshot: oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id)),
-    opdateret: new Date().toISOString()
+    snapshot: oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id))
   };
   tilstand.traening.sessioner = [...(tilstand.traening.sessioner || []), s];
   return s;
 }
 
+/** Har brugeren faktisk registreret noget på denne dag? */
+export function harIndhold(s) {
+  if (!s) return false;
+  return s.status !== STATUS.planlagt
+    || Number.isFinite(s.varighed)
+    || Number.isFinite(s.intervaller)
+    || Boolean(s.intensitet)
+    || Boolean(s.note)
+    || Object.keys(s.vaegte || {}).length > 0
+    || saetListe(s).length > 0;
+}
+
 /** Stempler en post, så synkroniseringen kan afgøre hvad der er nyest. */
-const stempl = o => { o.opdateret = new Date().toISOString(); return o; };
+const stempl = o => { o.opdateret = stempel(o.opdateret); return o; };
 
 export function saetStatus(tilstand, dato, status, naa = new Date()) {
   if (!Object.values(STATUS).includes(status)) return null;
   if (dato > iso(naa)) return null;            // man kan ikke gennemføre en dag, der ikke er kommet
+  const findes = sessionFor(tilstand, dato);
+  // At markere en urørt dag som "planlagt" er ikke en ændring — det er allerede
+  // det, den er. Uden den her linje ville ét klik på en frisk enhed oprette en
+  // tom session, der er nyere end den rigtige, og slette den ved synkronisering.
+  if (!findes && status === STATUS.planlagt) return null;
+  if (findes && findes.status === status) return findes;
   const s = sikrSession(tilstand, dato);
   s.status = status;
   if (status === STATUS.igang && !s.startet) s.startet = naa.toISOString();
@@ -290,32 +321,54 @@ export function gemSaet(tilstand, dato, oevelseId, saetNr, vaerdier = {}) {
   }
   const harVaerdi = ['gentagelser', 'vaegt', 'sekunder'].some(n => n in post);
   s.saet = s.saet.filter(x => !(x.oevelseId === oevelseId && x.saetNr === nr));
-  if (harVaerdi) {
-    s.saet.push(post);
+  // Hvert sæt har sit eget stempel. Så kan to enheder registrere hver sit sæt
+  // på samme dag uden at slå hinandens ud — og et tømt felt bliver til en
+  // gravsten, der faktisk forplanter sig, i stedet for at genopstå fra serveren.
+  if (harVaerdi) delete post.slettet;
+  else post.slettet = stempel(post.opdateret);
+  stempl(post);
+  s.saet.push(post);
+  if (harVaerdi && s.status === STATUS.planlagt) {
     // Er der tal i en træning, er den i gang — ellers ville de forsvinde i
     // statistikken, fordi kun gennemførte træninger tælles med.
-    if (s.status === STATUS.planlagt) s.status = STATUS.igang;
+    s.status = STATUS.igang;
   }
   stempl(s);
   s.saet.sort((a, b) => a.oevelseId.localeCompare(b.oevelseId) || a.saetNr - b.saetNr);
-  return post;
+  return harVaerdi ? post : null;
 }
 
+/** De sæt, der faktisk er registreret. Gravsten fra slettede sæt tælles ikke. */
+export const saetListe = session => (session?.saet || []).filter(x => !x.slettet);
+
 export const saetFor = (session, oevelseId, saetNr) =>
-  session?.saet?.find(x => x.oevelseId === oevelseId && x.saetNr === saetNr) || null;
+  saetListe(session).find(x => x.oevelseId === oevelseId && x.saetNr === saetNr) || null;
 
 /* ==================================================================
    GÅTURE — registreres separat fra dagens træning
 ================================================================== */
 
+/** De registrerede gåture. Gravsten fra slettede gåture tælles ikke med. */
+export const gaature = tilstand =>
+  (tilstand.traening?.gaature || []).filter(g => !g.slettet);
+
 export const gaaturFor = (tilstand, dato) =>
-  (tilstand.traening?.gaature || []).find(g => g.dato === dato) || null;
+  gaature(tilstand).find(g => g.dato === dato) || null;
 
 export function gemGaatur(tilstand, dato, minutter, note = '') {
+  const forrige = (tilstand.traening.gaature || []).find(g => g.dato === dato);
   const liste = (tilstand.traening.gaature || []).filter(g => g.dato !== dato);
   const m = Number(minutter);
+  // Stemplet bygger videre på det forrige. Ellers kan en gåtur, der bliver
+  // registreret og fortrudt i samme sekund, se lige gammel ud som sig selv.
+  const nu = stempel(forrige?.opdateret);
   if (Number.isFinite(m) && m > 0) {
-    liste.push({ dato, minutter: Math.round(m), note, opdateret: new Date().toISOString() });
+    liste.push({ dato, minutter: Math.round(m), note, opdateret: nu });
+  } else {
+    // Nul minutter betyder "der var alligevel ingen gåtur". Gravstenen sørger
+    // for, at sletningen også slår igennem på den anden enhed i stedet for at
+    // blive hentet tilbage ved næste synkronisering.
+    liste.push({ dato, minutter: null, note: '', slettet: nu, opdateret: nu });
   }
   tilstand.traening.gaature = liste.sort((a, b) => a.dato.localeCompare(b.dato));
   return gaaturFor(tilstand, dato);
@@ -375,14 +428,14 @@ export function ugensBalance(tilstand, dato) {
 ================================================================== */
 
 export function historik(tilstand, antal = 20) {
-  return (tilstand.traening?.sessioner || [])
+  return sessioner(tilstand)
     .filter(s => s.status === STATUS.gennemfoert || s.status === STATUS.sprunget)
     .sort((a, b) => b.dato.localeCompare(a.dato))
     .slice(0, antal);
 }
 
 const gennemfoerte = tilstand =>
-  (tilstand.traening?.sessioner || [])
+  sessioner(tilstand)
     .filter(s => s.status === STATUS.gennemfoert)
     .sort((a, b) => a.dato.localeCompare(b.dato));
 
@@ -390,7 +443,7 @@ const gennemfoerte = tilstand =>
 export function serie(tilstand, oevelseId, felt = 'gentagelser') {
   return gennemfoerte(tilstand)
     .map(s => {
-      const saet = (s.saet || []).filter(x => x.oevelseId === oevelseId && Number.isFinite(x[felt]));
+      const saet = saetListe(s).filter(x => x.oevelseId === oevelseId && Number.isFinite(x[felt]));
       if (!saet.length) return null;
       return { dato: s.dato, vaerdi: Math.max(...saet.map(x => x[felt])), saet: saet.length };
     })
@@ -508,7 +561,7 @@ function opfylder(tilstand, regel) {
       // Definitionen fra dengang træningen blev lavet — ikke den nuværende.
       const def = s.snapshot?.oevelseDef?.[regel.oevelseId] || OEVELSE_INDEX[regel.oevelseId];
       if (!def?.maalMaks) return false;
-      const saet = (s.saet || []).filter(x => x.oevelseId === regel.oevelseId && Number.isFinite(x.gentagelser));
+      const saet = saetListe(s).filter(x => x.oevelseId === regel.oevelseId && Number.isFinite(x.gentagelser));
       return saet.length >= def.saet && saet.every(x => x.gentagelser >= def.maalMaks);
     }).length;
     return { opfyldt: antal >= regel.betingelse.gange, antal, kraevet: regel.betingelse.gange };

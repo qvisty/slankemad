@@ -96,9 +96,17 @@
             <td class="kritik">Mørk tilstand var tokenombytning: kort og baggrund lå 1,09:1 fra hinanden og forsvandt på OLED. Sekundær tekst på sænkede flader målte 4,17:1, og "Hård"-mærkatet 3,65:1.</td>
             <td>Mørk baggrund sænket og fladen løftet, plus hårfin kant på alle kort i mørk tilstand. Grå tone og advarselsfarve mørknet, så begge passerer 4,5:1.</td>
             <td>Desktop udnytter stadig ikke bredden i ugevisningen.</td></tr>
-          <tr><td>16. Tests</td><td><span class="prik bestaaet">36 grønne</span></td><td>2</td>
+          <tr><td>18. Synkronisering (Supabase)</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Korrekthedskritikeren kørte koden mod en falsk Supabase og udslettede en fuldt registreret træning på tre måder: ét klik på "Planlagt" fra en frisk enhed, én afbrudt HTTP-forespørgsel, og en trigger der overskrev klientens tidsstempel, så "nyeste ændring vinder" i praksis var "sidst synkroniseret vinder". Sletninger genopstod, fordi der ikke fandtes gravsten, og indstillingsdokumentet lod den ene enhed miste alt uden besked.</td>
+            <td>Sæt flettes nu uafhængigt af deres session med hvert sit stempel — ingen delete-før-insert. Triggeren bevarer klientens stempel. Sletning efterlader gravsten. Indstillinger flettes del for del. Tomme, urørte sessioner sendes ikke og kan ikke vinde. Tidsstempler sammenlignes som tid, ikke som tekst, og to ændringer i samme millisekund kan skelnes.</td>
+            <td>Låst. 14 regressionstests, én pr. scenarie.</td></tr>
+          <tr><td>19. Sikkerhed i databasen</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Sikkerhedskritikeren frikendte selve RLS-politikkerne, men fandt tre huller udenom: appen tog imod et hvilket som helst token fra adressen, sæt kunne hænges på en fremmed brugers session og låse dennes synkronisering permanent, og login-endpointet kunne bruges til at oprette konti og sende mails fra projektet i det uendelige.</td>
+            <td>Engangskode på login-linket plus bekræftelse af kontoen, når linket åbnes på en anden enhed; kontoen bindes til de lokale data. Sammensat fremmednøgle (session, bruger). Oprettelse af brugere slået fra. Dertil <span class="noegle">force row level security</span>, størrelseslofter på JSONB, global logout og en CSP i <span class="noegle">index.html</span>.</td>
+            <td>Skemaet er kørt mod en rigtig PostgreSQL 16 og verificeret punkt for punkt — også opgradering fra den tidligere udgave.</td></tr>
+          <tr><td>16. Tests</td><td><span class="prik bestaaet">53 grønne</span></td><td>2</td>
             <td class="kritik">Testen for uændret historik ramte kun snapshottet og fangede derfor ikke, at to af tre skærme ignorerede det.</td>
-            <td>Ni nye tests: øjebliksbillede ved gennemførsel, frosne øvelsesdefinitioner, validering af sæt og felter, fremtidige dage, søndagens dobbelttælling og efterregistrering.</td>
+            <td>Ni nye tests om træning: øjebliksbillede ved gennemførsel, frosne øvelsesdefinitioner, validering af sæt og felter, fremtidige dage, søndagens dobbelttælling og efterregistrering. Dertil fjorten om synkronisering, kørt mod en falsk Supabase, der efterligner skemaets nøgler, upsert-semantik og trigger.</td>
             <td>Ingen automatiserede UI-tests — kun manuelt kørte browserflows.</td></tr>
           <tr><td>17. Slutpolering</td><td><span class="prik igang">I gang</span></td><td>1</td>
             <td class="kritik">Navngivning var inkonsistent: "Udvikling" i navigationen, "Progression" som sidetitel.</td>
@@ -116,6 +124,8 @@
       <div><p style="font-weight:650">To sektioner, ikke syv nav-punkter</p><p class="finprint">Træning og mad er to forskellige hoveder. Et skift øverst deler dem, så træningsvisningerne aldrig indeholder kost, kalorier eller mad — og bundnavigationen bliver ved med at have fem punkter på mobil.</p></div>
       <div><p style="font-weight:650">Øjebliksbillede på hver session</p><p class="finprint">En gennemført træning gemmer en kopi af skabelonen. Ændres planen senere, ændres historikken ikke. Det er verificeret med en test, der ændrer skabelonen bagefter.</p></div>
       <div><p style="font-weight:650">Ingen opdigtede tal</p><p class="finprint">Ingen kalorier, puls, tempo, distance, kondital eller træningsbelastning beregnes. Nøgletal vises kun for de øvelser, der faktisk er registreret data på.</p></div>
+      <div><p style="font-weight:650">Gravsten frem for fravær</p><p class="finprint">En slettet måling eller gåtur forsvinder ikke fra databasen — den får et <span class="noegle">slettet</span>-stempel. Uden det kan den anden enhed ikke se forskel på "slettet" og "har aldrig eksisteret", og sender posten tilbage ved næste synkronisering.</p></div>
+      <div><p style="font-weight:650">Klientens tidsstempel gælder</p><p class="finprint">Databasen stempler ikke selv ved skrivning. Gjorde den det, ville den enhed, der rettede sidst, men kom sidst online, tabe — og det er det modsatte af det, brugeren forventer.</p></div>
       <div><p style="font-weight:650">Progression foreslås, aldrig udføres</p><p class="finprint">Reglerne kigger på registrerede sæt og siger til. Intervalniveauet skifter først, når brugeren trykker ja — det er dækket af en test.</p></div>
     </div>
   </section>

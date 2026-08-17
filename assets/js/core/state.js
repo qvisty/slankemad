@@ -53,7 +53,7 @@ export const STANDARD = Object.freeze({
   log: [],
   onboardet: false,
   sidsteSektion: 'traening',
-  sky: { sidsteSync: null, indstillingerOpdateret: null, indstillingerSum: null }
+  sky: { sidsteSync: null, dele: {} }
 });
 
 let tilstand = laes();
@@ -94,7 +94,7 @@ function flet(standard, gemt) {
     log: Array.isArray(gemt.log) ? gemt.log : [],
     onboardet: !!gemt.onboardet,
     sidsteSektion: gemt.sidsteSektion === 'mad' ? 'mad' : 'traening',
-    sky: { ...standard.sky, ...(gemt.sky || {}) }
+    sky: { ...standard.sky, ...(gemt.sky || {}), dele: gemt.sky?.dele && typeof gemt.sky.dele === 'object' ? gemt.sky.dele : {} }
   };
 }
 

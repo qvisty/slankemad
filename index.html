@@ -8,6 +8,13 @@
 <meta name="theme-color" content="#faf9f4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
+<!-- GitHub Pages kan ikke sætte HTTP-headere, så politikken står her. Siden
+     henter intet udefra: ingen CDN, ingen scripts fra tredjepart, ingen
+     billeder fra fremmede domæner. Eneste udgående kald er til din egen
+     Supabase-database. Tokenet ligger i localStorage, og den her linje er det,
+     der gør ét indsprøjtet script til en umulighed frem for en kontoovertagelse. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://*.supabase.co; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; base-uri 'none'; object-src 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
 <link rel="stylesheet" href="./assets/css/app.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232f7a55'/%3E%3Ccircle cx='16' cy='16' r='8' fill='%23faf9f4'/%3E%3Ccircle cx='13' cy='14' r='2.4' fill='%23eb6834'/%3E%3Ccircle cx='19' cy='17' r='2.8' fill='%233f7d3a'/%3E%3C/svg%3E">
 </head>

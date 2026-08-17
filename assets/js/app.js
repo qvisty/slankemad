@@ -179,7 +179,9 @@ async function start() {
 
   // Hent ændringer fra andre enheder i baggrunden. Fejler det, mærker man
   // ingenting — appen kører videre på den lokale kopi.
-  if (skyErOpsat() && sky.erLoggetInd()) {
+  // Et ubekræftet login synkroniserer ikke af sig selv — brugeren skal først
+  // se under Mig, at kontoen er den rigtige.
+  if (skyErOpsat() && sky.erLoggetInd() && sky.erBekraeftet()) {
     sky.synkroniser().then(() => tegn()).catch(() => {});
   }
 }
