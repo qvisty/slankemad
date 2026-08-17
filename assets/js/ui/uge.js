@@ -4,7 +4,7 @@
 
 import { hent, opdater } from '../core/state.js';
 import * as tr from '../core/traening.js';
-import { TYPER, INTENSITETER } from '../data/traening.js';
+import { TYPER, INTENSITETER, SENERE } from '../data/traening.js';
 import { visTraening } from './traeningsark.js';
 import { ikon, saetDag } from './idag.js';
 import { esc, tal, toast } from './format.js';
@@ -24,8 +24,8 @@ export function html() {
   <div class="uge-navigation">
     <button class="rund" data-uge="-7" aria-label="Forrige uge">←</button>
     <div class="uge-titel">
-      <p style="font-weight:650">${erDenneUge ? 'Denne uge' : `${tr.datoTekst(uge)} – ${tr.datoTekst(sidste)}`}</p>
-      <p class="finprint">${erDenneUge ? `${tr.datoTekst(uge)} – ${tr.datoTekst(sidste)}` : 'Tidligere uge'}</p>
+      <p style="font-weight:650">${erDenneUge ? 'Denne uge' : (uge > tr.mandagI(tr.idag()) ? 'Kommende uge' : 'Tidligere uge')}</p>
+      <p class="finprint">${tr.datoTekst(uge)} – ${tr.datoTekst(sidste)}</p>
     </div>
     <button class="rund" data-uge="7" aria-label="Næste uge">→</button>
   </div>
@@ -64,6 +64,10 @@ export function html() {
           <summary>${esc(o.titel)}</summary>
           <p>${esc(o.tekst)}</p>
         </details>`).join('')}
+      <details class="guide-punkt">
+        <summary>${esc(SENERE.navn)}</summary>
+        <p>${esc(SENERE.resume)} ${esc(SENERE.begrundelse)} Mulige øvelser: ${SENERE.oevelser.map(esc).join(' · ')}.</p>
+      </details>
     </div>
   </section>`;
 }
@@ -104,8 +108,9 @@ function dagsraekke(d) {
         ? `<button class="mini ${d.gaaturLog ? 'aktiv' : ''}" data-gaatur="${d.dato}:${d.gaaturLog ? 0 : (d.gaatur || 60)}">
              ${d.gaaturLog ? `✓ Gåtur ${d.gaaturLog.minutter} min` : `+ Gåtur ${d.gaatur || 60} min`}
            </button>` : ''}
+      ${d.status === 'gennemfoert' && Number.isFinite(d.session?.varighed) ? `<span class="finprint">${d.session.varighed} min</span>` : ''}
       ${status !== 'gennemfoert'
-        ? `<button class="mini" data-faerdig="${d.dato}">Markér gennemført</button>`
+        ? `<button class="knap sek lille" data-faerdig="${d.dato}">Markér gennemført</button>`
         : `<button class="mini" data-planlagt="${d.dato}">Fortryd</button>`}
     </div>
   </div>`;
@@ -115,11 +120,10 @@ function balancelinje(navn, antal, planlagt, forklaring) {
   const pct = planlagt ? Math.min(100, (antal / planlagt) * 100) : 0;
   return `<div class="makro">
     <div class="makro-top">
-      <span class="makro-navn">${esc(navn)}</span>
+      <span class="makro-navn">${esc(navn)} <em class="finprint" style="font-style:normal;font-weight:400">${esc(forklaring)}</em></span>
       <span class="makro-tal">${antal} af ${planlagt}</span>
     </div>
     <div class="bar"><span style="width:${pct.toFixed(0)}%;background:var(--accent)"></span></div>
-    <p class="finprint">${esc(forklaring)}</p>
   </div>`;
 }
 

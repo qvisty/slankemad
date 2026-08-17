@@ -25,10 +25,11 @@ export function toast(besked) {
     el.setAttribute('role', 'status');
     Object.assign(el.style, {
       position: 'fixed', left: '50%', transform: 'translateX(-50%)',
-      bottom: 'calc(var(--bund) + 34px)', zIndex: '60',
-      background: 'var(--text)', color: 'var(--bg)',
+      bottom: 'calc(var(--bund) + 56px)', zIndex: '60',
+      background: 'var(--surface)', color: 'var(--text)',
+      boxShadow: '0 6px 24px rgba(0,0,0,.18), inset 0 0 0 1px var(--hairline)',
       padding: '10px 18px', borderRadius: '999px',
-      fontSize: '14px', fontWeight: '600', boxShadow: 'var(--e3)',
+      fontSize: '14px', fontWeight: '600',
       opacity: '0', transition: 'opacity .18s ease', pointerEvents: 'none',
       maxWidth: 'calc(100vw - 32px)', textAlign: 'center'
     });
@@ -37,5 +38,11 @@ export function toast(besked) {
   el.textContent = besked;
   requestAnimationFrame(() => { el.style.opacity = '1'; });
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 1700);
+  toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 1600);
+}
+
+/** Fjern kvitteringen med det samme — fx når man skifter side. */
+export function skjulToast() {
+  const el = document.getElementById('toast');
+  if (el) el.style.opacity = '0';
 }

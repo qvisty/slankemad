@@ -11,7 +11,9 @@
  *     distance eller belastning. Findes et tal ikke, er feltet tomt.
  */
 
-import { SKABELON_INDEX, UGEPLAN, OEVELSE_INDEX, REGLER } from '../data/traening.js';
+import { SKABELON_INDEX, UGEPLAN, OEVELSE_INDEX, REGLER, INTENSITETER } from '../data/traening.js';
+
+const INTENSITET_IDER = Object.keys(INTENSITETER);
 
 export const STATUS = {
   planlagt: 'planlagt',
@@ -101,6 +103,13 @@ export function saetNiveau(tilstand, skabelonId, niveauId) {
   const s = SKABELON_INDEX[skabelonId];
   if (!s?.niveauer?.some(n => n.id === niveauId)) return false;
   tilstand.traening.niveauer = { ...(tilstand.traening.niveauer || {}), [skabelonId]: niveauId };
+  // Sessioner, der endnu ikke er registreret, skal følge det nye valg — ellers
+  // står der 6 × 1 minut i historikken på en dag, hvor der blev løbet 4 × 4.
+  for (const sess of tilstand.traening.sessioner || []) {
+    if (sess.skabelonId !== skabelonId) continue;
+    if (sess.status === STATUS.gennemfoert || sess.status === STATUS.sprunget) continue;
+    sess.snapshot = oejebliksbillede(s, aktivtNiveau(tilstand, skabelonId));
+  }
   return true;
 }
 
@@ -114,20 +123,50 @@ export function saetNiveau(tilstand, skabelonId, niveauId) {
  */
 function oejebliksbillede(skabelon, niveau) {
   if (!skabelon) return null;
+  const oevelseIder = [...(skabelon.oevelser || []), skabelon.afslutning].filter(Boolean);
   return {
     skabelonId: skabelon.id,
     navn: skabelon.navn,
     type: skabelon.type,
     intensitet: skabelon.intensitet,
     varighed: skabelon.varighed,
+    varighedMin: skabelon.varighedMin || null,
+    varighedMaks: skabelon.varighedMaks || null,
+    tidspunkt: skabelon.tidspunkt || null,
+    resume: skabelon.resume || '',
+    formaal: skabelon.formaal ? [...skabelon.formaal] : [],
+    noter: skabelon.noter ? [...skabelon.noter] : [],
+    registrer: skabelon.registrer ? [...skabelon.registrer] : [],
     niveauId: niveau?.id || null,
     niveauNavn: niveau?.navn || null,
     blokke: niveau?.blokke ? structuredClone(niveau.blokke) : null,
     oevelser: skabelon.oevelser ? [...skabelon.oevelser] : null,
     afslutning: skabelon.afslutning || null,
     runder: skabelon.runder || null,
-    vaegtTracks: skabelon.vaegtTracks ? [...skabelon.vaegtTracks] : null
+    vaegtTracks: skabelon.vaegtTracks ? [...skabelon.vaegtTracks] : null,
+    // Øvelsernes definition fryses med, så en senere ændring af maalMaks eller
+    // antal sæt ikke omvurderer gammel træning med tilbagevirkende kraft.
+    oevelseDef: Object.fromEntries(oevelseIder
+      .filter(id => OEVELSE_INDEX[id])
+      .map(id => {
+        const o = OEVELSE_INDEX[id];
+        return [id, { navn: o.navn, saet: o.saet, maal: o.maal, maalMin: o.maalMin || null,
+          maalMaks: o.maalMaks || null, registrer: [...o.registrer], prSide: !!o.prSide,
+          formaal: o.formaal, beskrivelse: o.beskrivelse }];
+      }))
   };
+}
+
+/**
+ * Det, en dag skal VISES som: øjebliksbilledet hvis træningen er registreret,
+ * ellers den aktuelle plan. Uden det viser detaljevisningen den nuværende plan
+ * oven på gamle data — altså øvelser, brugeren aldrig lavede.
+ */
+export function visning(tilstand, dato) {
+  const s = sessionFor(tilstand, dato);
+  if (s?.snapshot && (s.status === STATUS.gennemfoert || s.status === STATUS.sprunget)) return s.snapshot;
+  const plan = planFor(dato);
+  return oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id));
 }
 
 export const sessionFor = (tilstand, dato) =>
@@ -159,26 +198,47 @@ export function sikrSession(tilstand, dato) {
 
 export function saetStatus(tilstand, dato, status, naa = new Date()) {
   if (!Object.values(STATUS).includes(status)) return null;
+  if (dato > iso(naa)) return null;            // man kan ikke gennemføre en dag, der ikke er kommet
   const s = sikrSession(tilstand, dato);
   s.status = status;
   if (status === STATUS.igang && !s.startet) s.startet = naa.toISOString();
   if (status === STATUS.gennemfoert) {
     s.sluttet = naa.toISOString();
-    if (s.varighed == null) {
-      const plan = planFor(dato);
-      s.varighed = s.snapshot?.varighed ?? plan.skabelon?.varighed ?? null;
-    }
+    // Snapshottet fryses her — det er nu, træningen er sket.
+    const plan = planFor(dato);
+    s.snapshot = oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id));
   }
+  // Varigheden opfindes ikke. Er den ikke tastet ind, er den tom — planens tal
+  // står som placeholder i formularen, men bliver aldrig til registreret data.
   return s;
 }
 
 /** Opdaterer felter på en session. Kun kendte felter, kun faktiske værdier. */
 export function gemSession(tilstand, dato, felter = {}) {
   const s = sikrSession(tilstand, dato);
-  const tilladt = ['varighed', 'intensitet', 'note', 'vaegte', 'intervaller', 'startet', 'sluttet'];
+  const plan = planFor(dato);
+  const tracks = s.snapshot?.vaegtTracks || plan.skabelon?.vaegtTracks || [];
+
   for (const [n, v] of Object.entries(felter)) {
-    if (!tilladt.includes(n)) continue;
-    s[n] = v === '' ? null : v;
+    if (n === 'varighed' || n === 'intervaller') {
+      const tal = tilTal(v);
+      s[n] = tal == null || tal < 0 || tal > (n === 'varighed' ? 600 : 60) ? null : tal;
+    } else if (n === 'intensitet') {
+      s.intensitet = INTENSITET_IDER.includes(v) ? v : null;
+    } else if (n === 'note') {
+      s.note = typeof v === 'string' ? v.slice(0, 500) : '';
+    } else if (n === 'vaegte') {
+      // Kun de tracks, træningen faktisk har — og kun tal.
+      const ud = {};
+      for (const [track, vaerdi] of Object.entries(v || {})) {
+        if (!tracks.includes(track)) continue;
+        const tal = tilTal(vaerdi);
+        if (tal != null && tal >= 0 && tal <= 300) ud[track] = tal;
+      }
+      s.vaegte = ud;
+    } else if (n === 'startet' || n === 'sluttet') {
+      s[n] = typeof v === 'string' ? v : null;
+    }
   }
   if (s.note == null) s.note = '';
   return s;
@@ -188,20 +248,48 @@ export function gemSession(tilstand, dato, felter = {}) {
  * Registrerer ét sæt. Tomme felter gemmes ikke som nul — de gemmes ikke.
  * @param {number} saetNr 1-indekseret
  */
+const GRAENSER = { gentagelser: 500, vaegt: 300, sekunder: 3600 };
+
+/** Tal fra et inputfelt: tom, whitespace og vrøvl bliver til ingenting — ikke til nul. */
+function tilTal(v) {
+  if (v == null || typeof v === 'boolean' || Array.isArray(v)) return null;
+  const s = String(v).trim();
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
 export function gemSaet(tilstand, dato, oevelseId, saetNr, vaerdier = {}) {
-  if (!OEVELSE_INDEX[oevelseId]) return null;
+  const oev = OEVELSE_INDEX[oevelseId];
+  if (!oev) return null;
+
+  // Øvelsen skal indgå i dagens træning. Ellers kunne armbøjninger registreres
+  // på en BodyPump-dag og tælle med i progressionsreglen.
+  const plan = planFor(dato);
+  const hoerer = [...(plan.skabelon?.oevelser || []), plan.skabelon?.afslutning].includes(oevelseId);
+  if (!hoerer) return null;
+
+  const nr = Number(saetNr);
+  if (!Number.isInteger(nr) || nr < 1 || nr > (oev.saet || 1)) return null;
+
   const s = sikrSession(tilstand, dato);
-  const post = s.saet.find(x => x.oevelseId === oevelseId && x.saetNr === saetNr)
-    || { oevelseId, saetNr };
+  const post = s.saet.find(x => x.oevelseId === oevelseId && x.saetNr === nr)
+    || { oevelseId, saetNr: nr };
   for (const n of ['gentagelser', 'vaegt', 'sekunder']) {
     if (!(n in vaerdier)) continue;
-    const v = vaerdier[n];
-    if (v === '' || v == null || !Number.isFinite(Number(v))) delete post[n];
-    else post[n] = Number(v);
+    if (!oev.registrer.includes(n)) continue;          // vægt på armbøjninger giver ingen mening
+    const v = tilTal(vaerdier[n]);
+    if (v == null || v < 0 || v > GRAENSER[n]) delete post[n];
+    else post[n] = v;
   }
   const harVaerdi = ['gentagelser', 'vaegt', 'sekunder'].some(n => n in post);
-  s.saet = s.saet.filter(x => !(x.oevelseId === oevelseId && x.saetNr === saetNr));
-  if (harVaerdi) s.saet.push(post);
+  s.saet = s.saet.filter(x => !(x.oevelseId === oevelseId && x.saetNr === nr));
+  if (harVaerdi) {
+    s.saet.push(post);
+    // Er der tal i en træning, er den i gang — ellers ville de forsvinde i
+    // statistikken, fordi kun gennemførte træninger tælles med.
+    if (s.status === STATUS.planlagt) s.status = STATUS.igang;
+  }
   s.saet.sort((a, b) => a.oevelseId.localeCompare(b.oevelseId) || a.saetNr - b.saetNr);
   return post;
 }
@@ -238,7 +326,7 @@ export function ugensDage(tilstand, dato) {
       status: session?.status || STATUS.planlagt,
       gaaturLog: gaaturFor(tilstand, d),
       // Historik viser det, der faktisk blev gennemført
-      vist: session?.snapshot || oejebliksbillede(plan.skabelon, aktivtNiveau(tilstand, plan.skabelon?.id))
+      vist: visning(tilstand, d)
     };
   });
 }
@@ -251,7 +339,10 @@ export function ugensBalance(tilstand, dato) {
   const planlagtTael = type => dage.filter(d => d.vist?.type === type).length;
 
   const gaaMinutter = dage.reduce((a, d) => a + (d.gaaturLog?.minutter || 0), 0);
-  const traeningsminutter = gennemfoert.reduce((a, d) => a + (d.session?.varighed || 0), 0);
+  // På en dag hvor gåturen ER træningen (søndag), tælles minutterne kun én gang.
+  const traeningsminutter = gennemfoert
+    .filter(d => !(d.gaaturErTraeningen && d.gaaturLog))
+    .reduce((a, d) => a + (d.session?.varighed || 0), 0);
 
   return {
     dage,
@@ -404,11 +495,12 @@ function opfylder(tilstand, regel) {
   const relevante = efter ? sessioner.filter(s => s.dato > efter) : sessioner;
 
   if (regel.betingelse.type === 'alleSaetPaaMaks') {
-    const oev = OEVELSE_INDEX[regel.oevelseId];
-    if (!oev?.maalMaks) return { opfyldt: false, antal: 0 };
     const antal = relevante.filter(s => {
-      const saet = (s.saet || []).filter(x => x.oevelseId === oev.id && Number.isFinite(x.gentagelser));
-      return saet.length >= oev.saet && saet.every(x => x.gentagelser >= oev.maalMaks);
+      // Definitionen fra dengang træningen blev lavet — ikke den nuværende.
+      const def = s.snapshot?.oevelseDef?.[regel.oevelseId] || OEVELSE_INDEX[regel.oevelseId];
+      if (!def?.maalMaks) return false;
+      const saet = (s.saet || []).filter(x => x.oevelseId === regel.oevelseId && Number.isFinite(x.gentagelser));
+      return saet.length >= def.saet && saet.every(x => x.gentagelser >= def.maalMaks);
     }).length;
     return { opfyldt: antal >= regel.betingelse.gange, antal, kraevet: regel.betingelse.gange };
   }
@@ -447,21 +539,12 @@ export function progressionsForslag(tilstand) {
     .filter(Boolean);
 }
 
-/**
- * Et forslag gælder alt, der er registreret indtil nu. Derfor sættes skæringen
- * til den seneste gennemførte træning — ikke bare til dags dato — så det samme
- * forslag ikke dukker op igen på baggrund af data, brugeren allerede har svaret på.
- */
-function skaering(tilstand, dato) {
-  const sidste = gennemfoerte(tilstand).at(-1)?.dato;
-  return sidste && sidste > dato ? sidste : dato;
-}
 
 /** Brugeren siger ja tak — først dér ændres noget. */
 export function accepterForslag(tilstand, regelId, dato = idag()) {
   const regel = REGLER.find(r => r.id === regelId);
   if (!regel) return false;
-  tilstand.traening.accepteret = { ...(tilstand.traening.accepteret || {}), [regelId]: skaering(tilstand, dato) };
+  tilstand.traening.accepteret = { ...(tilstand.traening.accepteret || {}), [regelId]: dato };
 
   // Intervalniveauet er det eneste forslag, der kan udføres af appen selv.
   if (regel.skabelonId) {
@@ -475,6 +558,6 @@ export function accepterForslag(tilstand, regelId, dato = idag()) {
 }
 
 export function afvisForslag(tilstand, regelId, dato = idag()) {
-  tilstand.traening.accepteret = { ...(tilstand.traening.accepteret || {}), [regelId]: skaering(tilstand, dato) };
+  tilstand.traening.accepteret = { ...(tilstand.traening.accepteret || {}), [regelId]: dato };
   return true;
 }

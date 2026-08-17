@@ -6,7 +6,7 @@
 
 import { hent, opdater } from '../core/state.js';
 import * as tr from '../core/traening.js';
-import { TYPER, INTENSITETER, SENERE } from '../data/traening.js';
+import { TYPER, INTENSITETER } from '../data/traening.js';
 import { visTraening } from './traeningsark.js';
 import { tal, esc, toast } from './format.js';
 import { tegn, gaaTil } from './bus.js';
@@ -17,7 +17,7 @@ export const saetDag = d => { vist = d; };
 export const nulstilDag = () => { vist = tr.idag(); };
 
 const STATUS_MAERKE = {
-  planlagt: '',
+  planlagt: 'Ikke registreret',
   igang: 'I gang',
   gennemfoert: 'Gennemført',
   sprunget: 'Sprunget over'
@@ -27,6 +27,7 @@ export function html() {
   const t = hent();
   const dato = vist;
   const plan = tr.planFor(dato);
+  const vis = tr.visning(t, dato);          // gennemført træning vises som den var, ikke som planen er nu
   const session = tr.sessionFor(t, dato);
   const status = session?.status || tr.STATUS.planlagt;
   const gaatur = tr.gaaturFor(t, dato);
@@ -42,38 +43,35 @@ export function html() {
   <section class="kort dagskort ${status === 'gennemfoert' ? 'faerdig' : ''}">
     <div class="dagskort-top">
       <div>
-        <p class="label">${esc(plan.navn)} · ${esc(tr.datoTekst(dato))}</p>
-        <h2 class="dagskort-titel">${esc(plan.skabelon.navn)}</h2>
+        <p class="label">${esc(plan.navn)}${erIdag ? '' : ` · ${esc(tr.datoTekst(dato))}`}</p>
+        <h2 class="dagskort-titel">${esc(vis.navn)}</h2>
       </div>
-      ${STATUS_MAERKE[status] ? `<span class="badge ${status}">${STATUS_MAERKE[status]}</span>` : ''}
+      <span class="badge ${status}">${STATUS_MAERKE[status]}</span>
     </div>
 
-    <div class="maerkater">
-      <span class="maerke">${esc(TYPER[plan.skabelon.type].navn)}</span>
-      <span class="maerke intensitet-${plan.skabelon.intensitet}">${esc(INTENSITETER[plan.skabelon.intensitet].navn)}</span>
-      <span class="maerke">${varighedTekst(plan.skabelon)}</span>
-      ${plan.skabelon.tidspunkt ? `<span class="maerke">${esc(plan.skabelon.tidspunkt)}</span>` : ''}
-      ${niveauMaerke(t, plan.skabelon)}
-    </div>
-
-    <p class="dagskort-resume">${esc(plan.skabelon.resume)}</p>
-
-    ${status === 'gennemfoert' ? resultat(session) : ''}
+    ${status === 'gennemfoert' ? resultat(session, vis) : `
+      <div class="maerkater">
+        <span class="maerke">${esc(TYPER[vis.type].navn)}</span>
+        <span class="maerke intensitet-${vis.intensitet}">${esc(INTENSITETER[vis.intensitet].navn)}</span>
+        <span class="maerke">${varighedTekst(vis)}</span>
+        ${vis.tidspunkt ? `<span class="maerke">${esc(vis.tidspunkt)}</span>` : ''}
+        ${vis.niveauNavn ? `<span class="maerke">${esc(vis.niveauNavn)}</span>` : ''}
+      </div>
+      <p class="dagskort-resume">${esc(vis.resume)}</p>`}
 
     <div class="knap-gruppe dagskort-handling">
       ${status === 'gennemfoert'
-        ? `<button class="knap" data-aabn>Se og ret registreringen</button>
-           <button class="knap tekst" data-status="planlagt">Fortryd</button>`
-        : `<button class="knap" data-faerdig>Markér som gennemført</button>
-           <button class="knap sek" data-aabn>Åbn træningen</button>`}
+        ? `<button class="knap sek" data-aabn>Se og ret registreringen</button>`
+        : `<button class="knap" data-aabn>Åbn træningen</button>
+           <button class="knap sek" data-faerdig>Markér gennemført</button>`}
     </div>
-    ${status !== 'gennemfoert' && status !== 'sprunget'
-      ? `<button class="mini" data-status="sprunget" style="justify-self:start">Sprang den over</button>`
-      : ''}
-    ${status === 'sprunget'
-      ? `<p class="finprint">Sprunget over. Det sker — ugen er ikke ødelagt af én træning.
-         <button class="mini" data-status="planlagt">Fortryd</button></p>`
-      : ''}
+    <div class="dagskort-tertiaer">
+      ${status !== 'gennemfoert' && status !== 'sprunget'
+        ? `<button class="mini" data-status="sprunget">Spring over</button>` : ''}
+      ${status === 'gennemfoert' || status === 'sprunget'
+        ? `<button class="mini" data-status="planlagt">Fortryd</button>` : ''}
+      ${status === 'sprunget' ? `<span class="finprint">Det sker. Ugen er ikke ødelagt af én træning.</span>` : ''}
+    </div>
   </section>
 
   ${gaaturKort(plan, gaatur)}
@@ -128,15 +126,7 @@ export function html() {
     ${seneste.length ? `<div class="liste">${seneste.map(s => historikRaekke(s)).join('')}</div>`
       : `<div class="kort"><p class="finprint">Historikken er tom. Den fyldes af det, du registrerer — der er ikke lagt noget ind på forhånd.</p></div>`}
   </section>
-
-  <section class="blok">
-    <div class="blok-hoved"><h2>Senere</h2></div>
-    <div class="kort">
-      <p style="font-weight:650;font-size:14.5px">${esc(SENERE.navn)}</p>
-      <p class="finprint" style="margin-top:4px">${esc(SENERE.resume)} ${esc(SENERE.begrundelse)}</p>
-      <p class="finprint" style="margin-top:6px">Mulige øvelser: ${SENERE.oevelser.map(esc).join(' · ')}.</p>
-    </div>
-  </section>`;
+`;
 }
 
 /* ---------------- byggeklodser ---------------- */
@@ -151,7 +141,7 @@ function niveauMaerke(t, skabelon) {
   return n ? `<span class="maerke">${esc(n.navn)}</span>` : '';
 }
 
-function resultat(session) {
+function resultat(session, vis) {
   const dele = [];
   if (Number.isFinite(session.varighed)) dele.push(`${session.varighed} min`);
   if (session.intensitet) dele.push(INTENSITETER[session.intensitet]?.navn || session.intensitet);
@@ -160,14 +150,36 @@ function resultat(session) {
   const saet = (session.saet || []).length;
 
   return `<div class="resultat">
-    <p class="label">Sådan gik det</p>
+    <p class="label">Sådan gik det${vis?.niveauNavn ? ` · ${esc(vis.niveauNavn)}` : ''}</p>
     ${dele.length ? `<p class="resultat-tal tal">${dele.map(esc).join(' · ')}</p>` : ''}
     ${vaegte.length ? `<p class="finprint">${vaegte.map(([k, v]) => `${esc(k)}: ${tal(v, Number(v) % 1 ? 1 : 0)} kg`).join(' · ')}</p>` : ''}
     ${saet ? `<p class="finprint">${saet} registrerede sæt</p>` : ''}
     ${session.note ? `<p class="tip" style="margin-top:8px">${esc(session.note)}</p>` : ''}
     ${!dele.length && !vaegte.length && !saet && !session.note
       ? `<p class="finprint">Registreret som gennemført. Åbn træningen, hvis du vil skrive tal på.</p>` : ''}
+    ${saetOpsummering(session)}
   </div>`;
+}
+
+/** De faktiske sæt, så tallene ikke forsvinder efter man har tastet dem ind. */
+function saetOpsummering(session) {
+  const efterOevelse = new Map();
+  for (const x of session.saet || []) {
+    if (!efterOevelse.has(x.oevelseId)) efterOevelse.set(x.oevelseId, []);
+    efterOevelse.get(x.oevelseId).push(x);
+  }
+  if (!efterOevelse.size) return '';
+  return `<ul class="saet-opsummering">
+    ${[...efterOevelse].map(([id, saet]) => {
+      const navn = session.snapshot?.oevelseDef?.[id]?.navn || id;
+      const tekst = saet.sort((a, b) => a.saetNr - b.saetNr)
+        .map(x => [Number.isFinite(x.gentagelser) ? x.gentagelser : null,
+                   Number.isFinite(x.vaegt) ? `${x.vaegt} kg` : null,
+                   Number.isFinite(x.sekunder) ? `${x.sekunder} sek` : null]
+          .filter(Boolean).join(' × ')).join(' · ');
+      return `<li><span>${esc(navn)}</span><span class="tal">${esc(tekst)}</span></li>`;
+    }).join('')}
+  </ul>`;
 }
 
 function gaaturKort(plan, gaatur) {
@@ -183,7 +195,7 @@ function gaaturKort(plan, gaatur) {
     <div class="knap-gruppe">
       ${logget
         ? `<button class="mini" data-gaatur="0">Fjern</button>`
-        : `<button class="knap sek lille" data-gaatur="${foreslaaet}">Registrér ${foreslaaet} min</button>`}
+        : `<button class="knap sek lille" data-gaatur="${foreslaaet}">Registrér</button>`}
     </div>
   </section>`;
 }

@@ -15,7 +15,7 @@
   --surface-warm: #f6f1e6;
   --text: #22221f;
   --text-muted: #63625a;   /* 5,9:1 på --surface — al sekundær tekst */
-  --text-faint: #74736a;   /* 4,6:1 — labels og finprint, aldrig lysere */
+  --text-faint: #6c6b63;   /* 5,2:1 — også læsbar på sænkede flader */
   --hairline: #e7e5dc;
 
   /* Accent — handling og fremdrift */
@@ -25,7 +25,7 @@
   --accent-ink: #1e5c3e;
 
   /* Varm sekundærfarve — mad, illustrationer, hygge */
-  --varm: #c8592f;
+  --varm: #a8431f;
   --varm-soft: #fbeae1;
 
   /* Semantik — bevidst adskilt fra accent */
@@ -60,22 +60,22 @@
 @media (prefers-color-scheme: dark) {
   :root:not([data-tema="lys"]) {
     color-scheme: dark;
-    --bg: #131312;
-    --surface: #1c1c1a;
+    --bg: #100f0e;
+    --surface: #1e1e1b;
     --surface-sunk: #26262300;
     --surface-sunk: #262624;
     --surface-warm: #24221e;
     --text: #f2f1ec;
     --text-muted: #adaca3;
     --text-faint: #97968d;
-    --hairline: #2e2e2b;
+    --hairline: #34342f;
 
     --accent: #4ba97a;
     --accent-press: #57b987;
     --accent-soft: #1b3529;
     --accent-ink: #8fd8b3;
 
-    --varm: #e0794c;
+    --varm: #ef8f60;
     --varm-soft: #2e211a;
 
     --over: #e07a63;
@@ -160,7 +160,19 @@ section.blok { display: grid; gap: var(--s3); }
   padding: var(--s4);
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-tema="lys"]) .kort { box-shadow: none; }
+  /* Skygger virker ikke på mørk baggrund. Adskillelsen skabes i stedet af en
+     løftet flade plus en hårfin kant — ellers forsvinder kortene på OLED. */
+  :root:not([data-tema="lys"]) .kort,
+  :root:not([data-tema="lys"]) .stat,
+  :root:not([data-tema="lys"]) .liste-raekke,
+  :root:not([data-tema="lys"]) .ugeraekke,
+  :root:not([data-tema="lys"]) .ugedag,
+  :root:not([data-tema="lys"]) .gruppe,
+  :root:not([data-tema="lys"]) .maaltid,
+  :root:not([data-tema="lys"]) .opskriftskort {
+    box-shadow: inset 0 0 0 1px var(--hairline);
+  }
+  :root:not([data-tema="lys"]) .ark { box-shadow: inset 0 0 0 1px var(--hairline); }
 }
 
 /* ---------------- Knapper ---------------- */
@@ -203,7 +215,7 @@ section.blok { display: grid; gap: var(--s3); }
 .makro-navn { font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
 .makro-prik { width: 8px; height: 8px; border-radius: 50%; }
 .makro-tal { color: var(--text-muted); font-variant-numeric: tabular-nums; font-weight: 550; }
-.bar { height: 6px; border-radius: var(--r-pill); background: var(--surface-sunk); overflow: hidden; }
+.bar { height: 8px; border-radius: var(--r-pill); background: var(--surface-sunk); overflow: hidden; box-shadow: inset 0 0 0 1px var(--hairline); }
 .bar span { display: block; height: 100%; border-radius: var(--r-pill); transition: width .5s ease; }
 
 /* ---------------- Nøgletal ---------------- */
@@ -217,6 +229,9 @@ section.blok { display: grid; gap: var(--s3); }
 .stat-vaerdi small { font-size: 13px; font-weight: 600; color: var(--text-muted); margin-left: 3px; letter-spacing: 0; }
 .stat-note { font-size: 12.5px; font-weight: 400; color: var(--text-muted); }
 .stat-note.god { color: #0ca30c; }   /* status, ikke brandfarve */
+
+/* Statusmærkat, når en træning hverken er gennemført eller sprunget over */
+.badge.planlagt { background: var(--surface-sunk); color: var(--text-muted); }
 .stat-note.over { color: var(--over); }
 
 /* ---------------- Dagsstribe ---------------- */
@@ -412,9 +427,14 @@ dialog.ark {
   position: fixed; bottom: 0; top: auto;
 }
 dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(2px); }
-.ark-indhold { overflow-y: auto; max-height: 92dvh; }
+.ark-indhold { overflow-y: auto; max-height: 92dvh; overscroll-behavior: contain; }
+.ark-bund {
+  position: sticky; bottom: 0; z-index: 3;
+  padding: var(--s3) 0 var(--s4);
+  background: linear-gradient(to bottom, transparent, var(--surface) 22%);
+}
 .ark-billede { width: 100%; aspect-ratio: 20 / 8.4; background: var(--surface-sunk); }
-.ark-krop { padding: var(--s5) var(--s4) var(--s10); display: grid; gap: var(--s4); }
+.ark-krop { padding: var(--s5) var(--s4) var(--s4); display: grid; gap: var(--s4); }
 .ark-luk {
   position: absolute; top: var(--s3); right: var(--s3); z-index: 2;
   width: 34px; height: 34px; border-radius: 50%; border: 0; cursor: pointer;
@@ -579,7 +599,7 @@ dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(
 .ugedag.klar { background: var(--accent-soft); }
 .ugedag.klar .u-status, .ugedag.klar svg { color: var(--accent-ink); }
 .ugedag.sprunget { opacity: .55; }
-.ugedag[aria-current="date"] { box-shadow: inset 0 0 0 2px var(--accent); }
+.ugedag[aria-current="date"] { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 /* ---------------- Lister ---------------- */
 .liste { display: grid; gap: 6px; }
@@ -599,10 +619,14 @@ dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(
 
 /* ---------------- Ugesiden ---------------- */
 .uge-navigation { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); }
+.uge-navigation .rund {
+  width: 44px; height: 44px; background: var(--surface); box-shadow: var(--e1);
+  color: var(--text); font-size: 17px;
+}
 .uge-titel { text-align: center; }
 .ugeraekke { background: var(--surface); border-radius: var(--r-md); box-shadow: var(--e1); overflow: hidden; }
 .ugeraekke-knap { box-shadow: none; border-radius: 0; }
-.ugeraekke.idag { box-shadow: inset 0 0 0 2px var(--accent), var(--e1); }
+.ugeraekke.idag { outline: 2px solid var(--accent); outline-offset: -2px; }
 .ugeraekke.gennemfoert .raekke-titel::after { content: ""; }
 .ugeraekke.sprunget { opacity: .6; }
 .ugeraekke-fod { display: flex; gap: var(--s2); flex-wrap: wrap; padding: 0 var(--s3) var(--s3) 50px; }
@@ -690,3 +714,14 @@ dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(
   :root:not([data-tema="lys"]) .oevelse-tegning,
   :root:not([data-tema="lys"]) .ark-tegning { color: var(--text-muted); }
 }
+
+/* Rettelser efter kritik: hierarki og trykflader i træningsdelen */
+.dagskort-tertiaer { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+.saet-opsummering { display: grid; gap: 3px; margin-top: 8px; }
+.saet-opsummering li {
+  display: flex; justify-content: space-between; gap: var(--s4);
+  font-size: 13.5px; color: var(--text-muted);
+}
+.saet-opsummering li span:last-child { font-weight: 600; color: var(--text); }
+.makro-navn em { color: var(--text-faint); margin-left: 6px; }
+.ugeraekke-fod .finprint { align-self: center; }

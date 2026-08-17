@@ -14,7 +14,8 @@ const nyTilstand = () => ({
   traening: { sessioner: [], gaature: [], niveauer: {}, accepteret: {} }
 });
 
-const MANDAG = '2026-08-17';   // verificeret: mandag
+// En uge der ligger i fortiden, så træninger kan markeres gennemført.
+const MANDAG = '2026-07-13';   // verificeret: mandag, og langt nok tilbage til flere ugers historik
 const dag = n => t.laegTil(MANDAG, n);
 
 /* ================= Ugeplanen ================= */
@@ -102,14 +103,22 @@ test('historikken er tom ved første installation', () => {
   assert.equal(t.progressionsForslag(st).length, 0);
 });
 
-test('en træning kan markeres gennemført og får varighed fra planen', () => {
+test('en træning kan markeres gennemført uden at der opfindes en varighed', () => {
   const st = nyTilstand();
   t.saetStatus(st, dag(0), t.STATUS.gennemfoert);
   const s = t.sessionFor(st, dag(0));
   assert.equal(s.status, 'gennemfoert');
-  assert.equal(s.varighed, 60);
+  assert.equal(s.varighed, null, 'planens 60 min er ikke registrerede data');
   assert.ok(s.sluttet, 'sluttidspunkt skal sættes');
   assert.equal(t.historik(st).length, 1);
+  assert.equal(t.ugensBalance(st, MANDAG).traeningsminutter, 0, 'ikke-registreret tid tælles ikke');
+});
+
+test('en fremtidig dag kan ikke markeres gennemført', () => {
+  const st = nyTilstand();
+  const imorgen = t.laegTil(t.idag(), 1);
+  assert.equal(t.saetStatus(st, imorgen, t.STATUS.gennemfoert), null);
+  assert.equal(t.sessionFor(st, imorgen), null);
 });
 
 test('en sprunget træning gemmes uden at blive talt som gennemført', () => {
@@ -152,6 +161,52 @@ test('ukendte øvelser og felter afvises', () => {
   assert.equal(s.note, 'god time');
 });
 
+test('sæt kan kun registreres på øvelser, der indgår i dagens træning', () => {
+  const st = nyTilstand();
+  assert.equal(t.gemSaet(st, dag(0), 'armboejninger', 1, { gentagelser: 15 }), null,
+    'armbøjninger hører ikke til mandagens BodyPump');
+  assert.equal(t.sessionFor(st, dag(0)), null);
+});
+
+test('sætnummer og felter valideres', () => {
+  const st = nyTilstand();
+  assert.equal(t.gemSaet(st, dag(4), 'armboejninger', 0, { gentagelser: 10 }), null, 'sæt 0 findes ikke');
+  assert.equal(t.gemSaet(st, dag(4), 'armboejninger', 9, { gentagelser: 10 }), null, 'øvelsen har tre sæt');
+  assert.equal(t.gemSaet(st, dag(4), 'armboejninger', 1.5, { gentagelser: 10 }), null);
+
+  t.gemSaet(st, dag(4), 'armboejninger', 1, { gentagelser: 10, vaegt: 40 });
+  const saet = t.saetFor(t.sessionFor(st, dag(4)), 'armboejninger', 1);
+  assert.equal(saet.gentagelser, 10);
+  assert.equal(saet.vaegt, undefined, 'armbøjninger registrerer ikke vægt');
+
+  t.gemSaet(st, dag(4), 'armboejninger', 2, { gentagelser: -5 });
+  assert.equal(t.saetFor(t.sessionFor(st, dag(4)), 'armboejninger', 2), null, 'negative gentagelser gemmes ikke');
+  t.gemSaet(st, dag(4), 'armboejninger', 2, { gentagelser: 1e9 });
+  assert.equal(t.saetFor(t.sessionFor(st, dag(4)), 'armboejninger', 2), null, 'urealistiske tal gemmes ikke');
+  t.gemSaet(st, dag(4), 'armboejninger', 2, { gentagelser: '  ' });
+  assert.equal(t.saetFor(t.sessionFor(st, dag(4)), 'armboejninger', 2), null, 'whitespace bliver ikke til nul');
+});
+
+test('sessionsfelter valideres, og vægte kan ikke bruges som bagdør', () => {
+  const st = nyTilstand();
+  t.gemSession(st, dag(0), {
+    varighed: -99, intensitet: 'ekstrem', intervaller: 'seks',
+    vaegte: { kalorier: 900, Squat: 'meget', Bryst: 42 }
+  });
+  const s = t.sessionFor(st, dag(0));
+  assert.equal(s.varighed, null, 'negativ varighed afvises');
+  assert.equal(s.intensitet, null, 'ukendt intensitet afvises');
+  assert.equal(s.intervaller, null, 'tekst afvises');
+  assert.deepEqual(s.vaegte, { Bryst: 42 }, 'kun kendte tracks med tal');
+});
+
+test('at registrere et sæt sætter træningen i gang', () => {
+  const st = nyTilstand();
+  t.gemSaet(st, dag(4), 'row', 1, { gentagelser: 12, vaegt: 10 });
+  assert.equal(t.sessionFor(st, dag(4)).status, 'igang',
+    'ellers ville tallene forsvinde ud af statistikken');
+});
+
 test('gåture registreres separat fra træningen', () => {
   const st = nyTilstand();
   t.gemGaatur(st, dag(0), 60);
@@ -185,9 +240,57 @@ test('en senere ændring af planen ændrer ikke gennemførte træninger', () => 
   assert.deepEqual(efter, foer, 'øjebliksbilledet må ikke ændre sig');
   assert.equal(efter.navn, 'Intervalløb');
   assert.equal(t.ugensDage(st, MANDAG)[5].vist.navn, 'Intervalløb', 'historikken viser det, der blev trænet');
+  assert.equal(t.visning(st, dag(5)).navn, 'Intervalløb',
+    'også detaljevisningen skal vise det, der blev trænet');
 
   skabelon.navn = oprindeligtNavn;
   skabelon.niveauer = oprindeligeNiveauer;
+});
+
+test('øjebliksbilledet fryses ved gennemførsel — ikke da dagen blev rørt', () => {
+  const st = nyTilstand();
+  t.gemSession(st, dag(5), { note: 'føltes frisk' });           // sessionen fødes her, på niveau 1
+  t.saetNiveau(st, 'loerdag-interval', 'n3');                   // brugeren vælger 4 × 4
+  t.gemSession(st, dag(5), { intervaller: 4 });
+  t.saetStatus(st, dag(5), t.STATUS.gennemfoert);
+
+  const snap = t.sessionFor(st, dag(5)).snapshot;
+  assert.equal(snap.niveauId, 'n3', 'historikken skal vise det niveau, der blev løbet');
+  assert.equal(snap.blokke.find(b => b.gentagelser).gentagelser, 4);
+
+  // ... og reglen skal kunne udløses af det niveau, der faktisk blev kørt
+  for (const uge of [1, 2]) {
+    const d = t.laegTil(dag(5), -7 * uge);
+    t.saetNiveau(st, 'loerdag-interval', 'n3');
+    t.saetStatus(st, d, t.STATUS.gennemfoert);
+    t.gemSession(st, d, { intervaller: 4 });
+  }
+  assert.ok(t.progressionsForslag(st).some(f => f.id === 'interval-niveau'),
+    'tre gennemførte 4 × 4 skal tælle');
+});
+
+test('øvelsesdefinitionen fryses med, så gammel træning ikke omvurderes', async () => {
+  const { OEVELSE_INDEX } = await import('../assets/js/data/traening.js');
+  const st = nyTilstand();
+  for (const nr of [1, 2, 3]) t.gemSaet(st, dag(4), 'armboejninger', nr, { gentagelser: 12 });
+  t.saetStatus(st, dag(4), t.STATUS.gennemfoert);
+
+  const oprindelig = OEVELSE_INDEX.armboejninger.maalMaks;
+  OEVELSE_INDEX.armboejninger.maalMaks = 12;         // målet sænkes bagefter
+  const forslag = t.progressionsForslag(st);
+  assert.equal(forslag.some(f => f.id === 'armboejninger-variant'), false,
+    'gammel træning må ikke omvurderes med tilbagevirkende kraft');
+  OEVELSE_INDEX.armboejninger.maalMaks = oprindelig;
+});
+
+test('søndagens gåtur tælles ikke både som gåtur og som træningstid', () => {
+  const st = nyTilstand();
+  t.gemGaatur(st, dag(6), 60);
+  t.saetStatus(st, dag(6), t.STATUS.gennemfoert);
+  t.gemSession(st, dag(6), { varighed: 60 });
+  const b = t.ugensBalance(st, MANDAG);
+  assert.equal(b.gaaMinutter, 60);
+  assert.equal(b.traeningsminutter, 0, 'gåturen ER søndagens træning');
 });
 
 /* ================= Progression ================= */
@@ -205,8 +308,8 @@ test('ingen forslag før betingelsen faktisk er opfyldt', () => {
 
 test('armbøjningsforslaget udløses af 15/15/15 to gange', () => {
   const st = nyTilstand();
+  fuldtHjemmesaet(st, t.laegTil(dag(4), -7), 15);
   fuldtHjemmesaet(st, dag(4), 15);
-  fuldtHjemmesaet(st, t.laegTil(dag(4), 7), 15);
   const forslag = t.progressionsForslag(st);
   const f = forslag.find(x => x.id === 'armboejninger-variant');
   assert.ok(f, 'forslaget skal komme');
@@ -215,18 +318,18 @@ test('armbøjningsforslaget udløses af 15/15/15 to gange', () => {
 
 test('et sæt under maks blokerer forslaget', () => {
   const st = nyTilstand();
-  fuldtHjemmesaet(st, dag(4), 15);
-  t.gemSaet(st, t.laegTil(dag(4), 7), 'armboejninger', 1, { gentagelser: 15 });
-  t.gemSaet(st, t.laegTil(dag(4), 7), 'armboejninger', 2, { gentagelser: 15 });
-  t.gemSaet(st, t.laegTil(dag(4), 7), 'armboejninger', 3, { gentagelser: 14 });
-  t.saetStatus(st, t.laegTil(dag(4), 7), t.STATUS.gennemfoert);
+  fuldtHjemmesaet(st, t.laegTil(dag(4), -7), 15);
+  t.gemSaet(st, dag(4), 'armboejninger', 1, { gentagelser: 15 });
+  t.gemSaet(st, dag(4), 'armboejninger', 2, { gentagelser: 15 });
+  t.gemSaet(st, dag(4), 'armboejninger', 3, { gentagelser: 14 });
+  t.saetStatus(st, dag(4), t.STATUS.gennemfoert);
   assert.equal(t.progressionsForslag(st).find(x => x.id === 'armboejninger-variant'), undefined);
 });
 
 test('row-forslaget kræver maks gentagelser i alle tre sæt', () => {
   const st = nyTilstand();
   for (const uge of [0, 1]) {
-    const d = t.laegTil(dag(4), uge * 7);
+    const d = t.laegTil(dag(4), -uge * 7);
     for (const nr of [1, 2, 3]) t.gemSaet(st, d, 'row', nr, { gentagelser: 15, vaegt: 10 });
     t.saetStatus(st, d, t.STATUS.gennemfoert);
   }
@@ -238,7 +341,7 @@ test('row-forslaget kræver maks gentagelser i alle tre sæt', () => {
 test('progression sker aldrig automatisk — kun når brugeren accepterer', () => {
   const st = nyTilstand();
   for (const uge of [0, 1, 2]) {
-    const d = t.laegTil(dag(5), uge * 7);
+    const d = t.laegTil(dag(5), -uge * 7);
     t.saetStatus(st, d, t.STATUS.gennemfoert);
     t.gemSession(st, d, { intervaller: 6 });
   }
@@ -256,11 +359,21 @@ test('progression sker aldrig automatisk — kun når brugeren accepterer', () =
 
 test('et afvist forslag kommer ikke igen med det samme', () => {
   const st = nyTilstand();
+  fuldtHjemmesaet(st, t.laegTil(dag(4), -7), 15);
   fuldtHjemmesaet(st, dag(4), 15);
-  fuldtHjemmesaet(st, t.laegTil(dag(4), 7), 15);
   assert.ok(t.progressionsForslag(st).some(f => f.id === 'armboejninger-variant'));
-  t.afvisForslag(st, 'armboejninger-variant', t.laegTil(dag(4), 7));
+  t.afvisForslag(st, 'armboejninger-variant', dag(4));
   assert.equal(t.progressionsForslag(st).some(f => f.id === 'armboejninger-variant'), false);
+});
+
+test('en glemt træning, der registreres bagud, tælles stadig med', () => {
+  const st = nyTilstand();
+  fuldtHjemmesaet(st, dag(4), 15);
+  t.afvisForslag(st, 'armboejninger-variant', dag(4));
+  // Nye træninger efter afvisningen skal kunne udløse forslaget igen
+  fuldtHjemmesaet(st, t.laegTil(dag(4), 7), 15);
+  fuldtHjemmesaet(st, t.laegTil(dag(4), 14), 15);
+  assert.ok(t.progressionsForslag(st).some(f => f.id === 'armboejninger-variant'));
 });
 
 /* ================= Nøgletal ================= */
@@ -284,11 +397,11 @@ test('træninger pr. uge tælles på den rigtige uge', () => {
   const st = nyTilstand();
   t.saetStatus(st, dag(0), t.STATUS.gennemfoert);
   t.saetStatus(st, dag(3), t.STATUS.gennemfoert);
-  t.saetStatus(st, t.laegTil(MANDAG, 7), t.STATUS.gennemfoert);
+  t.saetStatus(st, t.laegTil(MANDAG, -7), t.STATUS.gennemfoert);
   const uger = t.traeningerPrUge(st);
   assert.equal(uger.length, 2);
-  assert.deepEqual(uger.map(u => u.vaerdi), [2, 1]);
-  assert.equal(uger[0].dato, MANDAG);
+  assert.deepEqual(uger.map(u => u.vaerdi), [1, 2]);
+  assert.equal(uger[1].dato, MANDAG);
 });
 
 test('ugens balance tæller styrke, kondition og restitution hver for sig', () => {
@@ -317,7 +430,7 @@ test('ugen begynder mandag, uanset hvilken dag man kigger på', () => {
 test('sessioner er knyttet til dato, ikke til ugedag', () => {
   const st = nyTilstand();
   t.saetStatus(st, dag(0), t.STATUS.gennemfoert);
-  t.saetStatus(st, t.laegTil(MANDAG, 7), t.STATUS.planlagt);
+  t.saetStatus(st, t.laegTil(MANDAG, -7), t.STATUS.planlagt);
   assert.equal(t.sessionFor(st, dag(0)).status, 'gennemfoert');
-  assert.equal(t.sessionFor(st, t.laegTil(MANDAG, 7)).status, 'planlagt');
+  assert.equal(t.sessionFor(st, t.laegTil(MANDAG, -7)).status, 'planlagt');
 });

@@ -38,9 +38,9 @@
   <section class="kort">
     <h2 style="font-size:17px;margin-bottom:6px">Status lige nu</h2>
     <p class="muted" style="font-size:14px" data-status-tekst>
-      Datamodel, seed af ugeplanen og al logik er bygget og testet: 27 automatiserede tests kører grønt.
-      UI-delene bygges nu. Referenceanalysen af Hevy kører — resultatet afgør, om der overhovedet kan
-      laves en visuel sammenligning, eller om der skal bedes om screenshots.
+      Runde 2 er kørt: to kritikere med frisk kontekst — én på de renderede skærme, én der kørte koden og
+      efterregnede resultaterne. De fandt tilsammen 38 fejl, heraf to kritiske i logikken. De alvorlige er
+      rettet, og testsuiten er vokset fra 27 til 36 tests, alle grønne.
     </p>
   </section>
 
@@ -54,39 +54,56 @@
         <tbody data-dele>
           <tr><td>1. Projekt- og designanalyse</td><td><span class="prik bestaaet">Bestået</span></td><td>1</td>
             <td class="kritik">—</td>
-            <td>Stakken fastholdt: statisk ES-moduler, ingen build. Django ville gøre GitHub Pages-deployment umulig. Eksisterende design tokens og komponenter genbruges.</td>
+            <td>Stakken fastholdt: statisk ES-moduler, ingen build. Django ville gøre GitHub Pages-deployment umulig.</td>
             <td>Låst.</td></tr>
-          <tr><td>2. Hevy-reference</td><td><span class="prik igang">I gang</span></td><td>1</td>
-            <td class="kritik">Afventer researchagentens svar på, om produktionsversionen overhovedet kan hentes.</td>
-            <td>—</td>
-            <td>Kan referencen ikke hentes, stoppes sammenligningen, og der bedes om screenshots.</td></tr>
-          <tr><td>3. Informationsarkitektur</td><td><span class="prik igang">I gang</span></td><td>1</td>
-            <td class="kritik">—</td>
-            <td>Appen deles i to sektioner — Træning og Mad — med hver sin bundnavigation. Træning: I dag, Uge, Progression, Historik. Mad beholder sine fem.</td>
-            <td>Bekræftes af kodebase-auditten.</td></tr>
-          <tr><td>4. Datamodel</td><td><span class="prik bestaaet">Bestået</span></td><td>1</td>
-            <td class="kritik">—</td>
-            <td>Normaliseret og navngivet, så den kan oversættes 1:1 til tabeller: skabelon, øvelse, ugeplan, niveau, regel, session, sæt, gåtur. Sessioner gemmer et øjebliksbillede af skabelonen.</td>
-            <td>Låst indtil kritik.</td></tr>
-          <tr><td>5. Seed af ugeplanen</td><td><span class="prik bestaaet">Bestået</span></td><td>1</td>
-            <td class="kritik">—</td>
-            <td>Hele ugeplanen lagt ind præcis som beskrevet. Historikken er tom ved første installation.</td>
-            <td>Korrekthedskritik skal efterregne den.</td></tr>
-          <tr><td>6. I dag</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>Bygges nu.</td></tr>
-          <tr><td>7. Ugeoversigt</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>8. Registrering af træning</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>9. Hjemmetræning og sæt</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>10. Løbevisninger</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>11. Historik</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>12. Progression</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>13. Responsivitet</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>14. Mørk tilstand</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>15. Tilgængelighed</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
-          <tr><td>16. Tests</td><td><span class="prik bestaaet">27 grønne</span></td><td>1</td>
-            <td class="kritik">Ét testtilfælde fangede en rigtig fejl: et accepteret progressionsforslag dukkede op igen, fordi skæringsdatoen var dags dato frem for seneste registrerede træning.</td>
-            <td>Skæringen sættes nu til den seneste gennemførte træning.</td>
-            <td>Udvides, når UI-delene er bygget.</td></tr>
-          <tr><td>17. Slutpolering</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>2. Hevy-reference</td><td><span class="prik fravalgt">Kunne ikke hentes</span></td><td>1</td>
+            <td class="kritik">Alle domæner blokeret af netværkspolitikken: hevyapp.com, App Store, Google Play, mobbin, YouTube og alle billed-CDN'er. Ingen faktisk Hevy-skærm er set.</td>
+            <td>Sammenligningen er stoppet. Der er ikke lavet nogen visuel sammenligning, og der er ikke gættet på designdetaljer.</td>
+            <td>Afventer screenshots fra brugeren: routines-oversigt, rutinedetalje, aktiv logging, gennemført træning.</td></tr>
+          <tr><td>3. Informationsarkitektur</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Kritikeren kaldte sektionsskiftet "to informationsarkitekturer i ét produkt" — hele bundnavigationen skifter uden varsel.</td>
+            <td>Fastholdt som bevidst valg: alternativet er 7-9 nav-punkter på mobil, og kravet er at træningsdelen aldrig må indeholde kost.</td>
+            <td>Bevidst fravalg — skrevet ned nedenfor.</td></tr>
+          <tr><td>4. Datamodel</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Øjebliksbilledet blev frosset ved oprettelse frem for ved gennemførsel. Valgte man intervalniveau efter at have rørt dagen, viste historikken det forkerte niveau — og progressionsreglen kunne aldrig udløses.</td>
+            <td>Snapshottet skrives nu ved gennemførsel og opdateres ved niveauskift på ikke-registrerede dage. Øvelsesdefinitionerne fryses med, så gammel træning ikke omvurderes, hvis et mål ændres senere.</td>
+            <td>Låst.</td></tr>
+          <tr><td>5. Seed af ugeplanen</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Korrekthedskritikeren efterregnede alle syv dage, alle blokke og alle gåture: ingen fejl.</td>
+            <td>Uændret.</td>
+            <td>Låst.</td></tr>
+          <tr><td>6. I dag</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">"Gennemført" viste stadig planen — bare i grønt. Datoen stod to gange. Roadmap-kortet om fitnesslokalet var shippet som UI.</td>
+            <td>Gennemført tilstand viser nu resultatet inkl. de registrerede sæt, planchips forsvinder, status vises altid som mærkat, dubleret dato fjernet, roadmap flyttet til Uge.</td>
+            <td>Toasten dækker stadig et kort øjeblik indhold på små skærme.</td></tr>
+          <tr><td>7. Ugeoversigt</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">"I dag"-rammen blev tegnet forkert og stak uden for kortet. Balancebjælkerne lignede skillelinjer. Pileknapperne var under minimum trykflade.</td>
+            <td>Ramme tegnes med outline i stedet for inset-skygge, bjælkerne er højere med kant, pileknapper er 44 px, og forklaringen står nu ved sin egen bjælke.</td>
+            <td>Låst.</td></tr>
+          <tr><td>8-9. Registrering og sæt</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Størst fund: man kunne taste tolv tal ind i hjemmetræningen, og de dukkede aldrig op nogen steder bagefter. Dertil kunne sæt gemmes på øvelser, der ikke indgik i dagens træning, negative tal og 1e9 blev accepteret, og kalorier kunne smugles ind via vægt-feltet.</td>
+            <td>Registrering sætter nu træningen i gang, sættene vises i dagens resultat, og der valideres på øvelse, sætnummer, felt og værdiområde. Vægte accepteres kun på kendte tracks.</td>
+            <td>Låst.</td></tr>
+          <tr><td>10. Løbevisninger</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Variantvælgeren var ujævn, og arket viste den nuværende plan oven på gamle registreringer.</td>
+            <td>Registrerede træninger vises nu fra øjebliksbilledet, og variantvælgeren skjules, når træningen er registreret.</td>
+            <td>Låst.</td></tr>
+          <tr><td>11-12. Historik og progression</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Varigheden blev opfundet ud fra planen og præsenteret som registreret data.</td>
+            <td>Varighed er nu tom, indtil den tastes ind. Planens tal står som placeholder i formularen.</td>
+            <td>Låst.</td></tr>
+          <tr><td>13-15. Responsivitet, mørk tilstand, tilgængelighed</td><td><span class="prik igang">I gang</span></td><td>2</td>
+            <td class="kritik">Mørk tilstand var tokenombytning: kort og baggrund lå 1,09:1 fra hinanden og forsvandt på OLED. Sekundær tekst på sænkede flader målte 4,17:1, og "Hård"-mærkatet 3,65:1.</td>
+            <td>Mørk baggrund sænket og fladen løftet, plus hårfin kant på alle kort i mørk tilstand. Grå tone og advarselsfarve mørknet, så begge passerer 4,5:1.</td>
+            <td>Desktop udnytter stadig ikke bredden i ugevisningen.</td></tr>
+          <tr><td>16. Tests</td><td><span class="prik bestaaet">36 grønne</span></td><td>2</td>
+            <td class="kritik">Testen for uændret historik ramte kun snapshottet og fangede derfor ikke, at to af tre skærme ignorerede det.</td>
+            <td>Ni nye tests: øjebliksbillede ved gennemførsel, frosne øvelsesdefinitioner, validering af sæt og felter, fremtidige dage, søndagens dobbelttælling og efterregistrering.</td>
+            <td>Ingen automatiserede UI-tests — kun manuelt kørte browserflows.</td></tr>
+          <tr><td>17. Slutpolering</td><td><span class="prik igang">I gang</span></td><td>1</td>
+            <td class="kritik">Navngivning var inkonsistent: "Udvikling" i navigationen, "Progression" som sidetitel.</td>
+            <td>Knaptekster ensrettet ("Markér gennemført", "Spring over").</td>
+            <td>Navigationsnavnet mangler at blive ensrettet.</td></tr>
         </tbody>
       </table>
     </div>
@@ -107,7 +124,7 @@
     <h2 style="font-size:17px;margin-bottom:12px">Tests</h2>
     <div class="kort">
       <p class="finprint" style="margin-bottom:8px">Køres med <span class="noegle">node --test tests/</span> og i deployment-workflowet før hver udgivelse.</p>
-      <p style="font-size:14px" data-tests>27 tests, 27 grønne. Dækker ugeplanen dag for dag, registrering af træning og sæt, gåture som separat registrering, at historik ikke ændres når skabelonen ændres, alle progressionsregler, at progression aldrig sker automatisk, samt at nøgletal kun beregnes på faktiske data.</p>
+      <p style="font-size:14px" data-tests>36 tests, 36 grønne. Dækker ugeplanen dag for dag, registrering af træning og sæt, gåture som separat registrering, at historik ikke ændres når skabelonen ændres, alle progressionsregler, at progression aldrig sker automatisk, samt at nøgletal kun beregnes på faktiske data.</p>
     </div>
   </section>
 
@@ -117,6 +134,8 @@
       <p class="finprint">Django, DRF og serverside-rendering — se teknisk beslutning ovenfor.</p>
       <p class="finprint">Detaljeret BodyPump-logging pr. track. Instruktøren bestemmer programmet; kun vægten på stangen registreres, og kun på fire hovedtracks.</p>
       <p class="finprint">Adgangskontrol på denne statusside. Et statisk site kan ikke gøre det uden en server.</p>
+      <p class="finprint">Sektionsskiftet mellem Træning og Mad. Kritikeren kaldte det to informationsarkitekturer i ét produkt. Alternativet er 7-9 punkter i bundnavigationen, og kravet er, at træningsdelen aldrig indeholder kost. Valget står ved magt.</p>
+      <p class="finprint">Visuel sammenligning med Hevy. Referencen kunne ikke hentes, og en sammenligning mod en tekstbeskrivelse ville være teater.</p>
     </div>
   </section>
 

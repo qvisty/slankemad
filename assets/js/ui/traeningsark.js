@@ -39,10 +39,15 @@ function tegnArk() {
   const t = hent();
   const dato = aktivDato;
   const plan = tr.planFor(dato);
-  const s = plan.skabelon;
   const session = tr.sessionFor(t, dato);
   const status = session?.status || tr.STATUS.planlagt;
-  const niveau = tr.aktivtNiveau(t, s.id);
+  const laast = status === tr.STATUS.gennemfoert || status === tr.STATUS.sprunget;
+  // Er træningen registreret, vises den som den var — ikke som planen er nu.
+  const vis = tr.visning(t, dato);
+  const s = laast ? { ...plan.skabelon, ...vis, id: vis.skabelonId } : plan.skabelon;
+  const niveau = laast
+    ? { id: vis.niveauId, navn: vis.niveauNavn, blokke: vis.blokke }
+    : tr.aktivtNiveau(t, plan.skabelon.id);
   const d = sikrDialog();
 
   d.querySelector('.ark-indhold').innerHTML = `
@@ -56,20 +61,23 @@ function tegnArk() {
       </div>
 
       <div class="maerkater">
-        <span class="maerke intensitet-${s.intensitet}">${esc(INTENSITETER[s.intensitet].navn)}</span>
-        ${s.formaal.map(f => `<span class="maerke">${esc(f)}</span>`).join('')}
+        <span class="maerke intensitet-${s.intensitet}">${esc(INTENSITETER[s.intensitet]?.navn || s.intensitet)}</span>
+        <span class="maerke">${s.varighedMin && s.varighedMaks ? `${s.varighedMin}-${s.varighedMaks} min` : `${s.varighed} min`}</span>
+        ${s.tidspunkt ? `<span class="maerke">${esc(s.tidspunkt)}</span>` : ''}
+        ${(s.formaal || []).map(f => `<span class="maerke">${esc(f)}</span>`).join('')}
       </div>
 
-      ${niveauVaelger(s, niveau)}
+      ${laast ? '' : niveauVaelger(s, niveau)}
       ${indhold(t, s, niveau, session, dato)}
       ${registrering(s, session, dato)}
 
       ${s.noter?.length ? `<div class="tip">${s.noter.map(n => `<p>${esc(n)}</p>`).join('')}</div>` : ''}
 
-      <div class="knap-gruppe" style="position:sticky;bottom:0;background:var(--surface);padding:12px 0 0">
+      <div class="ark-bund">
         ${status === 'gennemfoert'
           ? `<button class="knap sek bred" data-luk>Færdig</button>`
-          : `<button class="knap bred" data-faerdig>Markér som gennemført</button>`}
+          : `<button class="knap bred" data-faerdig>Markér gennemført</button>
+             <p class="finprint" style="text-align:center;margin-top:8px">Tallene tæller først med i din progression, når træningen er markeret gennemført.</p>`}
       </div>
     </div>`;
 

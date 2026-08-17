@@ -12,7 +12,7 @@ import { hent, opdater, abonner } from './core/state.js';
 import { lavPlan } from './core/plan.js';
 import * as tr from './core/traening.js';
 import { saetTegner, saetSkifter } from './ui/bus.js';
-import { $, toast } from './ui/format.js';
+import { $, toast, skjulToast } from './ui/format.js';
 import * as dashboard from './ui/dashboard.js';
 import * as madplan from './ui/madplan.js';
 import * as opskrifter from './ui/opskrifter.js';
@@ -132,6 +132,7 @@ function skiftTil(id) {
 }
 
 function gaaTil(id) {
+  skjulToast();
   if (location.hash.slice(1) !== id) history.replaceState(null, '', `#${id}`);
   tegn();
   window.scrollTo({ top: 0, behavior: 'auto' });
