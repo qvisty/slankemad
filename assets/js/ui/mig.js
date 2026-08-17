@@ -348,7 +348,9 @@ export function bind(rod) {
     vis('Synkroniserer …');
     try {
       const r = await sky.synkroniser();
-      vis(`Færdig. ${r.op} sendt, ${r.ned} hentet.`);
+      vis(r.konflikt
+        ? `Færdig. ${r.op} sendt, ${r.ned} hentet. Dine indstillinger var ændret begge steder — denne enheds version blev beholdt.`
+        : `Færdig. ${r.op} sendt, ${r.ned} hentet.`);
       toast('Synkroniseret');
     } catch (err) {
       vis(`Kunne ikke synkronisere: ${err.message}`);

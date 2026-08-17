@@ -151,6 +151,22 @@ const nu = () => new Date().toISOString();
 /** Sammenligner to tidsstempler; tomme regnes som ældst. */
 const nyere = (a, b) => (a || '') > (b || '');
 
+/**
+ * Lille checksum af indstillingsdokumentet. Bruges til at afgøre, om DENNE
+ * enhed har ændret noget siden sidste synkronisering — så en ændring, brugeren
+ * lige har lavet, aldrig bliver overskrevet i stilhed af en ældre version fra
+ * en anden enhed.
+ */
+function checksum(o) {
+  const tekst = JSON.stringify(o);
+  let h = 2166136261;
+  for (let i = 0; i < tekst.length; i++) {
+    h ^= tekst.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36);
+}
+
 function tilSessionRaekke(s, bruger) {
   return {
     bruger,
@@ -212,8 +228,18 @@ export async function synkroniser() {
   };
   const fjernIndstillinger = (await db(`offentlig_indstillinger?bruger=eq.${bruger}&select=*`))?.[0];
   const lokalStempel = t.sky?.indstillingerOpdateret || '';
+  const lokalSum = checksum(lokalIndstillinger);
+  const aendretHer = lokalSum !== (t.sky?.indstillingerSum || '');
+  let konflikt = false;
 
-  if (fjernIndstillinger && nyere(fjernIndstillinger.opdateret, lokalStempel)) {
+  if (fjernIndstillinger && nyere(fjernIndstillinger.opdateret, lokalStempel) && aendretHer) {
+    // Begge sider har ændret sig. Denne enheds ændringer er dem, brugeren lige
+    // har lavet — de vinder, og det bliver sagt højt i stedet for at ske i
+    // stilhed. Den anden enheds version kan hentes ved at synkronisere der igen.
+    konflikt = true;
+  }
+
+  if (fjernIndstillinger && nyere(fjernIndstillinger.opdateret, lokalStempel) && !konflikt) {
     const d = fjernIndstillinger.data || {};
     opdater(s => {
       if (d.profil) s.profil = { ...s.profil, ...d.profil };
@@ -225,7 +251,16 @@ export async function synkroniser() {
       if (d.koeb) s.koeb = d.koeb;
       if (d.niveauer) s.traening.niveauer = d.niveauer;
       if (d.accepteret) s.traening.accepteret = d.accepteret;
-      s.sky = { ...(s.sky || {}), indstillingerOpdateret: fjernIndstillinger.opdateret };
+      s.sky = {
+        ...(s.sky || {}),
+        indstillingerOpdateret: fjernIndstillinger.opdateret,
+        indstillingerSum: checksum({
+          profil: s.profil, valg: s.valg, favoritter: s.favoritter, fravalgte: s.fravalgte,
+          plan: s.plan, gemtePlaner: s.gemtePlaner, koeb: s.koeb,
+          niveauer: s.traening?.niveauer || {}, accepteret: s.traening?.accepteret || {},
+          sidsteSektion: s.sidsteSektion
+        })
+      };
     }, { stille: true });
     ned++;
   } else {
@@ -235,7 +270,11 @@ export async function synkroniser() {
       prefer: 'resolution=merge-duplicates,return=representation'
     });
     opdater(s => {
-      s.sky = { ...(s.sky || {}), indstillingerOpdateret: svar?.[0]?.opdateret || nu() };
+      s.sky = {
+        ...(s.sky || {}),
+        indstillingerOpdateret: svar?.[0]?.opdateret || nu(),
+        indstillingerSum: lokalSum
+      };
     }, { stille: true });
     op++;
   }
@@ -349,7 +388,7 @@ export async function synkroniser() {
     s.sky = { ...(s.sky || {}), sidsteSync: nu() };
   });
 
-  return { op, ned };
+  return { op, ned, konflikt };
 }
 
 /** Fletter to lister nøgle for nøgle efter nyeste tidsstempel. Eksporteret for test. */

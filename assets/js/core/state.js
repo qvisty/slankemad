@@ -53,7 +53,7 @@ export const STANDARD = Object.freeze({
   log: [],
   onboardet: false,
   sidsteSektion: 'traening',
-  sky: { sidsteSync: null, indstillingerOpdateret: null }
+  sky: { sidsteSync: null, indstillingerOpdateret: null, indstillingerSum: null }
 });
 
 let tilstand = laes();
