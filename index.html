@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Slankemad — madplan og indkøb til fedttab med styrketræning</title>
-<meta name="description" content="Ugentlig madplan og REMA 1000-indkøbsliste bygget til fedttab med højt protein, BodyPump og kreatin. Lækre, hurtige retter — ikke en kur.">
+<title>Slankemad — træning og madplan til fedttab</title>
+<meta name="description" content="Personligt overblik over ugens træning — og en madplan med REMA 1000-indkøbsliste. Bygget til fedttab med BodyPump, uden at tabe muskelmasse.">
 <meta name="theme-color" content="#faf9f4" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#131312" media="(prefers-color-scheme: dark)">
 <meta name="color-scheme" content="light dark">
@@ -14,32 +14,16 @@
 <body>
 <div class="app">
 
-  <nav class="bundnav" role="tablist" aria-label="Hovednavigation">
-    <span class="mrk">Slankemad</span>
-    <button role="tab" data-side="oversigt" aria-selected="true">
-      <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.2"/><path d="M12 3.8a8.2 8.2 0 0 1 7.4 4.7"/><circle cx="12" cy="12" r="2.6"/></svg>
-      <span class="navn">Oversigt</span></button>
-    <button role="tab" data-side="madplan" aria-selected="false">
-      <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.5 3.5v7a2.2 2.2 0 0 0 4.4 0v-7"/><path d="M8.7 10.5v10"/><path d="M17.3 3.5c-1.6 1-2.4 2.9-2.4 5.2 0 1.6.8 2.6 2.4 2.8v9"/></svg>
-      <span class="navn">Madplan</span></button>
-    <button role="tab" data-side="opskrifter" aria-selected="false">
-      <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4.8h6.2c1 0 1.8.8 1.8 1.8v12c0-1-.8-1.8-1.8-1.8H4z"/><path d="M20 4.8h-6.2c-1 0-1.8.8-1.8 1.8v12c0-1 .8-1.8 1.8-1.8H20z"/></svg>
-      <span class="navn">Opskrifter</span></button>
-    <button role="tab" data-side="indkob" aria-selected="false">
-      <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5.6 8h12.8l-1 11.2a1.8 1.8 0 0 1-1.8 1.6H8.4a1.8 1.8 0 0 1-1.8-1.6z"/><path d="M9 8V6.4a3 3 0 0 1 6 0V8"/></svg>
-      <span class="navn">Indkøb</span></button>
-    <button role="tab" data-side="mig" aria-selected="false">
-      <svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.4" r="3.6"/><path d="M5 20.2c0-3.5 3.1-5.6 7-5.6s7 2.1 7 5.6"/></svg>
-      <span class="navn">Mig</span></button>
-  </nav>
+  <nav class="bundnav" role="tablist" aria-label="Hovednavigation"></nav>
 
   <div>
     <header class="top">
       <div class="top-inder">
         <div>
-          <h1 id="sidetitel">Oversigt</h1>
-          <p class="undertitel" id="sideunder">Ugen på fem sekunder</p>
+          <h1 id="sidetitel">I dag</h1>
+          <p class="undertitel" id="sideunder"></p>
         </div>
+        <div class="segment sektionsskift" id="sektionsskift" role="group" aria-label="Skift mellem træning og mad"></div>
       </div>
     </header>
 

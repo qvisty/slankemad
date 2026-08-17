@@ -529,3 +529,164 @@ dialog.ark::backdrop { background: rgba(20, 20, 18, .45); backdrop-filter: blur(
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* ==================================================================
+   TRÆNING
+   Genbruger tokens og komponenter fra madplanen. Ingen nye farver ud over
+   én markering af hård intensitet — træningstype bæres af form (ikoner),
+   ikke af farve, så den kan aflæses uden farvesyn.
+================================================================== */
+
+.sektionsskift { flex: 0 0 auto; padding: 3px; }
+.sektionsskift button { min-height: 32px; padding: 0 14px; font-size: 13px; }
+
+/* ---------------- Dagens træning ---------------- */
+.dagskort { display: grid; gap: var(--s3); }
+.dagskort-top { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s3); }
+.dagskort-titel { font-size: 24px; font-weight: 700; letter-spacing: -.02em; margin-top: 2px; }
+.dagskort-resume { font-size: 14.5px; color: var(--text-muted); line-height: 1.55; }
+.dagskort-handling { margin-top: 2px; }
+.dagskort-handling .knap { flex: 1 1 auto; }
+.dagskort.faerdig { background: var(--accent-soft); }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="lys"]) .dagskort.faerdig { background: var(--accent-soft); }
+}
+
+.badge.gennemfoert { background: var(--accent); color: var(--paa-accent); }
+.badge.igang { background: var(--varm-soft); color: var(--varm); }
+.badge.sprunget { background: var(--surface-sunk); color: var(--text-muted); }
+
+.maerke.intensitet-haard { background: var(--varm-soft); color: var(--varm); }
+
+.resultat { background: var(--surface-sunk); border-radius: var(--r-md); padding: var(--s3) var(--s4); display: grid; gap: 4px; }
+.resultat-tal { font-size: 16px; font-weight: 650; }
+
+/* ---------------- Gåtur ---------------- */
+.gaatur { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); }
+.gaatur-tekst { display: grid; gap: 2px; }
+.gaatur.logget { background: var(--surface-warm); }
+
+/* ---------------- Ugestribe på forsiden ---------------- */
+.ugestribe { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+.ugedag {
+  border: 0; cursor: pointer; background: var(--surface); box-shadow: var(--e1);
+  border-radius: var(--r-md); padding: 8px 2px 6px;
+  display: grid; justify-items: center; gap: 3px; color: var(--text-muted);
+}
+.ugedag .u-navn { font-size: 10.5px; font-weight: 650; letter-spacing: .03em; text-transform: uppercase; color: var(--text-faint); }
+.ugedag svg { color: var(--text-muted); }
+.ugedag .u-status { font-size: 11px; font-weight: 700; height: 13px; line-height: 13px; }
+.ugedag.klar { background: var(--accent-soft); }
+.ugedag.klar .u-status, .ugedag.klar svg { color: var(--accent-ink); }
+.ugedag.sprunget { opacity: .55; }
+.ugedag[aria-current="date"] { box-shadow: inset 0 0 0 2px var(--accent); }
+
+/* ---------------- Lister ---------------- */
+.liste { display: grid; gap: 6px; }
+.liste-raekke, .ugeraekke-knap {
+  display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: var(--s3);
+  width: 100%; text-align: left; border: 0; cursor: pointer;
+  background: var(--surface); box-shadow: var(--e1); border-radius: var(--r-md);
+  padding: var(--s3); min-height: 60px; color: inherit;
+}
+.raekke-ikon { display: grid; place-items: center; color: var(--text-muted); }
+.raekke-tekst { display: grid; gap: 1px; min-width: 0; }
+.raekke-titel { font-size: 14.5px; font-weight: 650; }
+.raekke-under { font-size: 12.5px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.raekke-note { font-size: 12.5px; color: var(--text-faint); font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.raekke-status { font-size: 15px; font-weight: 700; color: var(--text-faint); }
+.raekke-status.gennemfoert { color: var(--accent); }
+
+/* ---------------- Ugesiden ---------------- */
+.uge-navigation { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); }
+.uge-titel { text-align: center; }
+.ugeraekke { background: var(--surface); border-radius: var(--r-md); box-shadow: var(--e1); overflow: hidden; }
+.ugeraekke-knap { box-shadow: none; border-radius: 0; }
+.ugeraekke.idag { box-shadow: inset 0 0 0 2px var(--accent), var(--e1); }
+.ugeraekke.gennemfoert .raekke-titel::after { content: ""; }
+.ugeraekke.sprunget { opacity: .6; }
+.ugeraekke-fod { display: flex; gap: var(--s2); flex-wrap: wrap; padding: 0 var(--s3) var(--s3) 50px; }
+.mini.aktiv { color: var(--accent); font-weight: 650; }
+.balance-fod { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); padding-top: var(--s2); border-top: 1px solid var(--hairline); }
+
+/* ---------------- Forslag ---------------- */
+.forslag { border-left: 3px solid var(--accent); }
+
+/* ---------------- Træningsarket ---------------- */
+.ark-h3 { font-size: 16px; font-weight: 650; margin-bottom: 10px; }
+.ark-hoved { display: grid; gap: 2px; }
+.ark-tegning {
+  background: var(--surface-sunk); border-radius: var(--r-md); color: var(--text-muted);
+  padding: 6px; margin-bottom: var(--s3); display: grid; place-items: center;
+}
+.ark-tegning svg { width: 100%; max-width: 172px; height: auto; }
+
+.blokke { display: grid; gap: 6px; counter-reset: blok; }
+.blok-raekke {
+  display: grid; grid-template-columns: 82px 1fr; gap: var(--s3); align-items: baseline;
+  padding: 11px var(--s3); border-radius: var(--r-md); background: var(--surface-sunk);
+}
+.blok-raekke.blok-hurtigt { background: var(--varm-soft); }
+.blok-tid { font-weight: 700; font-size: 14px; }
+.blok-navn { font-size: 14.5px; }
+.blok-navn em { display: block; font-style: normal; font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* ---------------- Øvelser ---------------- */
+.oevelse {
+  background: var(--surface-sunk); border-radius: var(--r-lg); padding: var(--s3) var(--s4) var(--s4);
+  margin-bottom: var(--s3);
+}
+.oevelse-top { display: grid; grid-template-columns: 112px 1fr auto; gap: var(--s3); align-items: center; }
+.oevelse-tegning {
+  background: var(--surface); border-radius: var(--r-md); padding: 6px; color: var(--text-muted);
+}
+.oevelse-tegning svg { width: 100%; height: auto; display: block; }
+.oevelse h4 { font-size: 15.5px; font-weight: 650; }
+.oevelse-hjaelp { margin-top: var(--s3); }
+.oevelse-hjaelp summary {
+  font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; list-style: none;
+  padding: 4px 0; text-decoration: underline; text-underline-offset: 3px;
+}
+.oevelse-hjaelp summary::-webkit-details-marker { display: none; }
+.oevelse-hjaelp p { font-size: 13.5px; color: var(--text-muted); line-height: 1.55; margin-top: 4px; }
+
+.saet-liste { display: grid; gap: 6px; margin-top: var(--s3); }
+.saet-raekke {
+  display: flex; align-items: center; gap: var(--s2);
+  background: var(--surface); border-radius: var(--r-md); padding: 7px var(--s3); min-height: 48px;
+}
+.saet-nr { font-size: 13px; font-weight: 650; color: var(--text-muted); width: 74px; flex: 0 0 auto; }
+.felt-lille { display: inline-flex; align-items: center; gap: 5px; flex: 1 1 0; min-width: 0; }
+.felt-lille input {
+  width: 100%; min-width: 0; min-height: 38px; padding: 0 10px; border: 0;
+  border-radius: var(--r-sm); background: var(--surface-sunk); color: var(--text);
+  font-size: 16px; font-weight: 650; font-variant-numeric: tabular-nums; text-align: center;
+}
+.felt-lille input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.felt-lille input.gemt { box-shadow: inset 0 0 0 2px var(--accent); }
+.felt-lille .enhed { font-size: 11.5px; color: var(--text-faint); white-space: nowrap; flex: 0 0 auto; }
+.felt-lille.bred { display: grid; grid-template-columns: 1fr; gap: 4px; }
+.felt-lille.bred .track { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+.felt-lille.bred .enhed { text-align: center; }
+.sidst { margin-top: 8px; }
+
+.felt-med-enhed { position: relative; display: flex; align-items: center; gap: 6px; }
+.felt-med-enhed input { flex: 1; min-height: 46px; padding: 0 var(--s3); border: 0; border-radius: var(--r-md); background: var(--surface-sunk); color: var(--text); font-size: 16px; font-variant-numeric: tabular-nums; }
+.felt-med-enhed .enhed { font-size: 12.5px; color: var(--text-faint); }
+.reg-felter { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
+.vaegt-gitter { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s2); }
+
+@media (min-width: 560px) {
+  .oevelse-top { grid-template-columns: 148px 1fr auto; }
+  .vaegt-gitter { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 900px) {
+  .ugestribe { gap: var(--s2); }
+  .ugedag { padding: 12px 4px 10px; }
+}
+
+/* Stregtegningerne skal have ro i mørk tilstand */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="lys"]) .oevelse-tegning,
+  :root:not([data-tema="lys"]) .ark-tegning { color: var(--text-muted); }
+}

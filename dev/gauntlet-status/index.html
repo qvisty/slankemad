@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gauntlet-status — træningsdelen</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
+<link rel="stylesheet" href="../../assets/css/app.css">
+<style>
+  .status-side { max-width: 1000px; margin: 0 auto; padding: 24px 16px 64px; display: grid; gap: 24px; }
+  .status-tabel { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  .status-tabel th { text-align: left; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--text-faint); padding: 10px 12px; }
+  .status-tabel td { padding: 11px 12px; border-top: 1px solid var(--hairline); vertical-align: top; }
+  .status-tabel tr td:first-child { font-weight: 650; white-space: nowrap; }
+  .prik { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; font-weight: 600; font-size: 12.5px; }
+  .prik::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex: 0 0 auto; }
+  .bestaaet { color: var(--accent); }
+  .igang { color: var(--kulhydrat); }
+  .venter { color: var(--text-faint); }
+  .fravalgt { color: var(--text-muted); }
+  .rul { overflow-x: auto; }
+  .kritik { color: var(--text-muted); }
+  .noegle { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; }
+</style>
+</head>
+<body>
+<div class="status-side">
+
+  <header style="display:grid;gap:6px">
+    <p class="label">Udviklingsstatus · træningsdelen</p>
+    <h1 style="font-size:27px;font-weight:700">Bygget del for del, kritiseret undervejs</h1>
+    <p class="muted" style="font-size:14.5px">Hver del bygges færdig, kritiseres af en kritiker med frisk kontekst, og bygges om. Siden opdateres under arbejdet — ikke bagefter.</p>
+    <p class="finprint">Denne side er udviklingsdokumentation. Den er markeret <span class="noegle">noindex</span>, men et statisk site kan ikke skjule den bag login — det er et bevidst fravalg, da den ikke indeholder personlige data.</p>
+    <p><a class="knap sek lille" href="../../index.html">Åbn appen</a> <a class="knap sek lille" href="../../progress.html">Madplanens status</a></p>
+  </header>
+
+  <section class="kort">
+    <h2 style="font-size:17px;margin-bottom:6px">Status lige nu</h2>
+    <p class="muted" style="font-size:14px" data-status-tekst>
+      Datamodel, seed af ugeplanen og al logik er bygget og testet: 27 automatiserede tests kører grønt.
+      UI-delene bygges nu. Referenceanalysen af Hevy kører — resultatet afgør, om der overhovedet kan
+      laves en visuel sammenligning, eller om der skal bedes om screenshots.
+    </p>
+  </section>
+
+  <section>
+    <h2 style="font-size:17px;margin-bottom:12px">Dele</h2>
+    <div class="kort rul">
+      <table class="status-tabel">
+        <thead>
+          <tr><th>Del</th><th>Status</th><th>Runde</th><th>Seneste kritik</th><th>Hvad blev ændret</th><th>Næste skridt</th></tr>
+        </thead>
+        <tbody data-dele>
+          <tr><td>1. Projekt- og designanalyse</td><td><span class="prik bestaaet">Bestået</span></td><td>1</td>
+            <td class="kritik">—</td>
+            <td>Stakken fastholdt: statisk ES-moduler, ingen build. Django ville gøre GitHub Pages-deployment umulig. Eksisterende design tokens og komponenter genbruges.</td>
+            <td>Låst.</td></tr>
+          <tr><td>2. Hevy-reference</td><td><span class="prik igang">I gang</span></td><td>1</td>
+            <td class="kritik">Afventer researchagentens svar på, om produktionsversionen overhovedet kan hentes.</td>
+            <td>—</td>
+            <td>Kan referencen ikke hentes, stoppes sammenligningen, og der bedes om screenshots.</td></tr>
+          <tr><td>3. Informationsarkitektur</td><td><span class="prik igang">I gang</span></td><td>1</td>
+            <td class="kritik">—</td>
+            <td>Appen deles i to sektioner — Træning og Mad — med hver sin bundnavigation. Træning: I dag, Uge, Progression, Historik. Mad beholder sine fem.</td>
+            <td>Bekræftes af kodebase-auditten.</td></tr>
+          <tr><td>4. Datamodel</td><td><span class="prik bestaaet">Bestået</span></td><td>1</td>
+            <td class="kritik">—</td>
+            <td>Normaliseret og navngivet, så den kan oversættes 1:1 til tabeller: skabelon, øvelse, ugeplan, niveau, regel, session, sæt, gåtur. Sessioner gemmer et øjebliksbillede af skabelonen.</td>
+            <td>Låst indtil kritik.</td></tr>
+          <tr><td>5. Seed af ugeplanen</td><td><span class="prik bestaaet">Bestået</span></td><td>1</td>
+            <td class="kritik">—</td>
+            <td>Hele ugeplanen lagt ind præcis som beskrevet. Historikken er tom ved første installation.</td>
+            <td>Korrekthedskritik skal efterregne den.</td></tr>
+          <tr><td>6. I dag</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>Bygges nu.</td></tr>
+          <tr><td>7. Ugeoversigt</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>8. Registrering af træning</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>9. Hjemmetræning og sæt</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>10. Løbevisninger</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>11. Historik</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>12. Progression</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>13. Responsivitet</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>14. Mørk tilstand</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>15. Tilgængelighed</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+          <tr><td>16. Tests</td><td><span class="prik bestaaet">27 grønne</span></td><td>1</td>
+            <td class="kritik">Ét testtilfælde fangede en rigtig fejl: et accepteret progressionsforslag dukkede op igen, fordi skæringsdatoen var dags dato frem for seneste registrerede træning.</td>
+            <td>Skæringen sættes nu til den seneste gennemførte træning.</td>
+            <td>Udvides, når UI-delene er bygget.</td></tr>
+          <tr><td>17. Slutpolering</td><td><span class="prik venter">Venter</span></td><td>—</td><td class="kritik">—</td><td>—</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2 style="font-size:17px;margin-bottom:12px">Tekniske beslutninger</h2>
+    <div class="kort" style="display:grid;gap:12px" data-beslutninger>
+      <div><p style="font-weight:650">Ikke Django</p><p class="finprint">Instruktionen siger, at projektets eksisterende stack har forrang. Projektet er en statisk side uden build, deployet fra <span class="noegle">main</span> til GitHub Pages. Django kræver en server og ville gøre den deployment umulig. Datamodellen er til gengæld normaliseret og navngivet, så den kan flyttes til Django/Postgres uden at frontend skal skrives om.</p></div>
+      <div><p style="font-weight:650">To sektioner, ikke syv nav-punkter</p><p class="finprint">Træning og mad er to forskellige hoveder. Et skift øverst deler dem, så træningsvisningerne aldrig indeholder kost, kalorier eller mad — og bundnavigationen bliver ved med at have fem punkter på mobil.</p></div>
+      <div><p style="font-weight:650">Øjebliksbillede på hver session</p><p class="finprint">En gennemført træning gemmer en kopi af skabelonen. Ændres planen senere, ændres historikken ikke. Det er verificeret med en test, der ændrer skabelonen bagefter.</p></div>
+      <div><p style="font-weight:650">Ingen opdigtede tal</p><p class="finprint">Ingen kalorier, puls, tempo, distance, kondital eller træningsbelastning beregnes. Nøgletal vises kun for de øvelser, der faktisk er registreret data på.</p></div>
+      <div><p style="font-weight:650">Progression foreslås, aldrig udføres</p><p class="finprint">Reglerne kigger på registrerede sæt og siger til. Intervalniveauet skifter først, når brugeren trykker ja — det er dækket af en test.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2 style="font-size:17px;margin-bottom:12px">Tests</h2>
+    <div class="kort">
+      <p class="finprint" style="margin-bottom:8px">Køres med <span class="noegle">node --test tests/</span> og i deployment-workflowet før hver udgivelse.</p>
+      <p style="font-size:14px" data-tests>27 tests, 27 grønne. Dækker ugeplanen dag for dag, registrering af træning og sæt, gåture som separat registrering, at historik ikke ændres når skabelonen ændres, alle progressionsregler, at progression aldrig sker automatisk, samt at nøgletal kun beregnes på faktiske data.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2 style="font-size:17px;margin-bottom:12px">Bevidste fravalg</h2>
+    <div class="kort" style="display:grid;gap:10px" data-fravalg>
+      <p class="finprint">Django, DRF og serverside-rendering — se teknisk beslutning ovenfor.</p>
+      <p class="finprint">Detaljeret BodyPump-logging pr. track. Instruktøren bestemmer programmet; kun vægten på stangen registreres, og kun på fire hovedtracks.</p>
+      <p class="finprint">Adgangskontrol på denne statusside. Et statisk site kan ikke gøre det uden en server.</p>
+    </div>
+  </section>
+
+  <footer class="finprint">Opdateres løbende under arbejdet.</footer>
+</div>
+</body>
+</html>

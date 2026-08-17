@@ -11,7 +11,7 @@
 const NOEGLE = 'slankemad:v2';
 
 export const STANDARD = Object.freeze({
-  version: 2,
+  version: 3,
   profil: {
     koen: 'mand',
     alder: 42,
@@ -41,11 +41,18 @@ export const STANDARD = Object.freeze({
   },
   favoritter: [],
   fravalgte: [],
+  traening: {
+    sessioner: [],     // én pr. dato der er rørt ved — svarer til workout_session
+    gaature: [],       // walk_session
+    niveauer: {},      // valgt niveau pr. skabelon (fx intervalløb)
+    accepteret: {}     // progressionsforslag brugeren har taget stilling til
+  },
   plan: null,
   gemtePlaner: [],
   koeb: {},
   log: [],
-  onboardet: false
+  onboardet: false,
+  sidsteSektion: 'traening'
 });
 
 let tilstand = laes();
@@ -63,7 +70,7 @@ function laes() {
 
 function flet(standard, gemt) {
   return {
-    version: 2,
+    version: 3,
     profil: { ...standard.profil, ...(gemt.profil || {}) },
     valg: {
       ...standard.valg,
@@ -75,8 +82,17 @@ function flet(standard, gemt) {
     plan: gemt.plan || null,
     gemtePlaner: Array.isArray(gemt.gemtePlaner) ? gemt.gemtePlaner : [],
     koeb: gemt.koeb && typeof gemt.koeb === 'object' ? gemt.koeb : {},
+    traening: {
+      ...standard.traening,
+      ...(gemt.traening || {}),
+      sessioner: Array.isArray(gemt.traening?.sessioner) ? gemt.traening.sessioner : [],
+      gaature: Array.isArray(gemt.traening?.gaature) ? gemt.traening.gaature : [],
+      niveauer: gemt.traening?.niveauer && typeof gemt.traening.niveauer === 'object' ? gemt.traening.niveauer : {},
+      accepteret: gemt.traening?.accepteret && typeof gemt.traening.accepteret === 'object' ? gemt.traening.accepteret : {}
+    },
     log: Array.isArray(gemt.log) ? gemt.log : [],
-    onboardet: !!gemt.onboardet
+    onboardet: !!gemt.onboardet,
+    sidsteSektion: gemt.sidsteSektion === 'mad' ? 'mad' : 'traening'
   };
 }
 
