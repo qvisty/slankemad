@@ -110,6 +110,20 @@ export const OPSKRIFTER = [
     tip: 'Weekendens "snyd", der ikke er snyd. Ca. 40 g protein i en stak pandekager.'
   },
 
+  {
+    id: 'm-spejlaeg', navn: 'Spejlæg på rugbrød med ost', kategori: 'morgenmad',
+    tid: 10, basis: 1, tags: ['weekend', 'klassiker'],
+    kort: 'Weekendens morgenmad: blomme der løber, sprødt rugbrød, en skive ost.',
+    ing: [['aeg', 3], ['rugbrod', 80], ['ost', 25], ['cherrytomat', 80], ['olie', 6]],
+    fremgang: [
+      'Varm olien op på middel varme — ikke høj, ellers bliver hviden brun og sej, før blommen er varm.',
+      'Slå æggene i og læg låg på i to minutter. Så bliver hviden sat, og blommen løber stadig.',
+      'Rist rugbrødet, læg ost på den ene skive, og lad spejlæggene glide ovenpå.',
+      'Salt, groft peber og halverede tomater ved siden af.'
+    ],
+    tip: 'Låg på panden er forskellen på et spejlæg og et halvfærdigt spejlæg.'
+  },
+
   // ================= FROKOST =================
   {
     id: 'f-tacosalat', navn: 'Kylling-tacosalat med lime og sriracha-dressing', kategori: 'frokost',
@@ -623,6 +637,20 @@ export const OPSKRIFTER = [
       'Olie, eddike, salt og peber. Færdig.'
     ],
     tip: 'To æg oveni salaten er 13 g protein for 156 kcal. Det er det billigste protein på hele buffeten.'
+  },
+  {
+    id: 'u-salatbar-plus', navn: 'Salatbar plus lidt af den varme ret', kategori: 'frokost',
+    ude: true, sted: 'Kantinen', tid: 5, basis: 1, tags: ['ude', 'salat', 'favorit'],
+    kort: 'Sådan ser en almindelig hverdagsfrokost ud, når rækkefølgen er rigtig.',
+    ing: [['salatmix', 180], ['kyllingebryst', 120], ['kikaerter', 100], ['cherrytomat', 100],
+          ['agurk', 80], ['majs', 50], ['olie', 8], ['kartofler', 100], ['hakketokse', 70]],
+    fremgang: [
+      'Byg salaten først, og tag proteinet fra salatbaren, før du kigger på den varme ret: kylling, tun, æg eller bønner. To øser.',
+      'Fyld resten af tallerkenen med grønt, så der er mindre plads tilbage.',
+      'Tag så en lille portion af den varme ret ovenpå — en tredjedel af en normal portion. Er den paneret eller cremet, så tag kun kartoflerne eller risene.',
+      'Sovs ved siden af, ikke hen over. Så bestemmer du selv mængden.'
+    ],
+    tip: 'Rækkefølgen er hele tricket: salat først, protein næst, varm ret sidst. Du får smagen med, uden at portionen bestemmer over dig.'
   },
   {
     id: 'u-hovedret', navn: 'Halv portion af dagens varme ret + stor salat', kategori: 'frokost',

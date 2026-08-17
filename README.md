@@ -17,9 +17,10 @@ kreatin — og uden at det føles som en kur.
 | | |
 |---|---|
 | **Madplan** | 3-7 dage med morgenmad, frokost, aftensmad og snacks. Byt en enkelt ret, lav en enkelt dag om, eller lav hele ugen om. Favoritter vægtes tungere næste gang. Planer kan gemmes og hentes frem igen. |
-| **Opskrifter** | 55 retter med ingredienser, mængder skaleret til antal personer, tilberedningstid, fremgangsmåde og fuld næring pr. portion. Mærkater som *hurtig*, *proteinrig*, *billig*, *god træningsdag* og *god hviledag* beregnes af koden — de kan ikke komme i utakt med tallene. |
+| **Opskrifter** | 57 retter med ingredienser, mængder skaleret til antal personer, tilberedningstid, fremgangsmåde og fuld næring pr. portion. Mærkater som *hurtig*, *proteinrig*, *billig*, *god træningsdag* og *god hviledag* beregnes af koden — de kan ikke komme i utakt med tallene. |
 | **Indkøbsliste** | Alle råvarer fra planen lagt sammen på tværs af retter og sorteret efter afdeling i butikken. Kan grupperes efter ret i stedet, krydses af undervejs, kopieres og printes. |
-| **Måltider du får serveret** | Får du morgenmad og frokost i kantinen eller ved en salatbar i hverdagen, så slå det til under Mig. Planen lægger så kun aftensmad og weekend ind, og de serverede måltider tæller stadig med i kalorier og makroer — men kommer aldrig på indkøbslisten. |
+| **Dagsrytme** | Sæt dine spisetider, så snacks lægges i dagens længste hul i stedet for lige før et måltid — og se om et mellemmåltid på formiddagen overhovedet gør gavn. |
+| **Måltider du får serveret** | Får du morgenmad og frokost i kantinen eller ved en salatbar i hverdagen, så slå det til under Mig (det er slået til som standard). Planen lægger så kun aftensmad og weekend ind, og de serverede måltider tæller stadig med i kalorier og makroer — men kommer aldrig på indkøbslisten. |
 | **Råvaregenbrug** | Generatoren belønner retter, der bruger råvarer, ugen allerede har åbnet, og straffer en ny fersk pakke, hvor halvdelen bliver til rest. Færre varer, mindre madspild. |
 | **Oversigt** | Gennemsnitlige kalorier og makroer pr. dag, antal måltider, tid i køkkenet, fordeling af hurtige vs. længere retter og status på fedttabet. |
 | **Fremskridt** | Log vægt og taljemål. Taljen får sin egen graf, fordi kreatin binder vand og gør vægten upålidelig de første uger. |

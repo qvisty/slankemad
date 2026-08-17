@@ -22,6 +22,10 @@ export const GUIDE = [
     tekst: 'Mål om morgenen, før morgenmad, i navlehøjde, uden at spænde eller suge ind. Én gang om ugen er nok. Vægten svinger 1-2 kg på salt, kulhydrater, vand og afføring — taljemålet lyver mindre om netop mavefedt. Se på tendensen over 3-4 uger, ikke på det enkelte tal.'
   },
   {
+    titel: 'Kulhydrater er ikke fjenden — pasta må gerne være der',
+    tekst: 'Der er ikke noget ved pasta, ris eller kartofler, der i sig selv gør dig federe. Det er kalorieunderskuddet, der afgør fedttabet, og kulhydrat er brændstoffet til de gentagelser, du laver til Bodypump. Skærer du dem væk, mens du træner og er i underskud, bliver træningen typisk dårligere, og det er netop træningen, der skal beskytte musklerne. To ting er værd at holde øje med: portionsstørrelsen, fordi pasta er nem at spise meget af, og det der kommer i — fløde, pesto og ost fylder hurtigt mere end pastaen selv. Derfor er retterne her bygget med fuldkornspasta, en proteinkilde og dobbelt så meget grønt, som du tror der skal til. Appen lægger desuden de mest stivelsesrige retter på dine træningsdage og de lettere på hviledagene.'
+  },
+  {
     titel: 'Protein og fibre er mæthed, ikke moral',
     tekst: 'Hvert måltid her er bygget op om en proteinkilde og en stor mængde grønt. Det er ikke for renhedens skyld — det er, fordi protein og fibre er det, der gør et måltid mættende pr. kalorie. Det er nemmere at holde et underskud, man ikke mærker så meget.'
   },

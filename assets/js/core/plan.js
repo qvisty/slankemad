@@ -107,6 +107,20 @@ function portionsfaktorer(valgte, slots, budget) {
  * Vægtene er tunet så mad-lyst og variation kan slå et par procent på
  * kalorierne — planen skal være til at holde, ikke matematisk perfekt.
  */
+/**
+ * Kulhydrater gør mest gavn på de dage, du løfter. Det er en mild vægtning —
+ * ikke et forbud — så pasta og ris lander oftere på Bodypump-dage og sjældnere
+ * på hviledage, uden at nogen ret bliver forbudt.
+ */
+function kulhydratStraf(o, traener) {
+  const m = makro(o);
+  if (m.kcal <= 0) return 0;
+  const andel = (m.k * 4) / m.kcal;
+  if (andel < 0.30) return 0;
+  const over = (andel - 0.30) * 100;                 // 0-30 point afhængigt af hvor stivelsesrig retten er
+  return traener ? -over * 0.35 : over * 0.35;
+}
+
 function score(valgte, slots, ctx, maalKcal) {
   let tid = 0;
   for (const o of valgte) tid += o.tid;
@@ -124,20 +138,23 @@ function score(valgte, slots, ctx, maalKcal) {
   straf += tid / 10;                                                    // hurtigt vinder ved uafgjort
 
   const set = new Set();
-  for (const o of valgte) {
+  valgte.forEach((o, i) => {
     if (set.has(o.id)) straf += 50;                                      // samme ret to gange samme dag
     set.add(o.id);
 
     const gange = ctx.brugte.get(o.id) || 0;
-    const erRester = o.id === ctx.forrigeAften && o.kategori === 'aftensmad';
-    if (erRester && ctx.valg.rester) straf -= 10;                        // rester er en gevinst
-    else straf += gange * 45;                                            // ellers: variation — samme ret to gange på en uge er dyrt
+    // Rester er kun rester, når gårsdagens aftensmad bliver til dagens frokost.
+    // Den samme aftensmad to aftener i træk er ikke rester — det er ensformigt.
+    const erRester = slots[i] === 'frokost' && o.id === ctx.forrigeAften;
+    if (erRester && ctx.valg.rester) straf -= 10;
+    else straf += gange * gange * 60;                                    // variation: anden gang koster, tredje gang koster meget
 
     if (ctx.favoritter.includes(o.id)) straf -= 22;                      // dine egne favoritter vejer tungest
     else if (harFavoritVare(o)) straf -= 7;                              // kylling, laks, tun, salat …
 
     straf += raavareStraf(o, ctx);
-  }
+    straf += kulhydratStraf(o, ctx.traener);
+  });
   return { straf, faktorer, kcal, protein };
 }
 
@@ -165,6 +182,7 @@ function raavareStraf(o, ctx) {
 /* ---------------- bygning ---------------- */
 
 function byggDag(ctx, dagNr, traener) {
+  ctx.traener = traener;
   const oenskede = slotsFor(ctx.valg);
   // Er et måltid filtreret helt væk (fx både laktose og gluten fravalgt), så
   // udelader vi slottet og siger det højt — i stedet for at bygge en plan på
