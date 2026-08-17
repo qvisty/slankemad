@@ -294,6 +294,7 @@ section.blok { display: grid; gap: var(--s3); }
 }
 .opskriftskort .billede { aspect-ratio: 16 / 11; width: 100%; background: var(--surface-sunk); }
 .opskriftskort .krop { padding: var(--s3); display: grid; gap: 5px; align-content: start; }
+.opskriftskort .label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .opskriftskort h3 {
   font-size: 14.5px; font-weight: 650; line-height: 1.3;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;

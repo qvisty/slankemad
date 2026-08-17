@@ -10,6 +10,11 @@ import { linjegraf } from './graf.js';
 import { tal, esc, idag, toast } from './format.js';
 import { tegn } from './bus.js';
 
+/** Grænser der holder beregningen meningsfuld — og advarer i stedet for at regne videre på vrøvl. */
+const GRAENSER = {
+  vaegt: [35, 250], maalvaegt: [35, 250], hojde: [120, 230], alder: [15, 100]
+};
+
 export function html() {
   const t = hent();
   const p = t.profil;
@@ -20,12 +25,12 @@ export function html() {
     <div class="blok-hoved"><h2>Dine tal</h2></div>
     <div class="kort felter">
       <div class="felt-par">
-        <label class="felt"><span>Vægt (kg)</span><input type="number" inputmode="decimal" step="0.1" name="vaegt" value="${p.vaegt}"></label>
-        <label class="felt"><span>Målvægt (kg)</span><input type="number" inputmode="decimal" step="0.1" name="maalvaegt" value="${p.maalvaegt}"></label>
+        <label class="felt"><span>Vægt (kg)</span><input type="number" inputmode="decimal" step="0.1" min="35" max="250" name="vaegt" value="${p.vaegt}"></label>
+        <label class="felt"><span>Målvægt (kg)</span><input type="number" inputmode="decimal" step="0.1" min="35" max="250" name="maalvaegt" value="${p.maalvaegt}"></label>
       </div>
       <div class="felt-par">
-        <label class="felt"><span>Højde (cm)</span><input type="number" inputmode="numeric" name="hojde" value="${p.hojde}"></label>
-        <label class="felt"><span>Alder</span><input type="number" inputmode="numeric" name="alder" value="${p.alder}"></label>
+        <label class="felt"><span>Højde (cm)</span><input type="number" inputmode="numeric" min="120" max="230" name="hojde" value="${p.hojde}"></label>
+        <label class="felt"><span>Alder</span><input type="number" inputmode="numeric" min="15" max="100" name="alder" value="${p.alder}"></label>
       </div>
       <label class="felt"><span>Køn (til stofskifteberegningen)</span>
         <select name="koen">
@@ -161,6 +166,7 @@ function maalBoks() {
     </div>
     ${m.procentPrUge > 0.9 ? `<p class="advarsel">Det tempo er over 0,9 % af din kropsvægt om ugen. Det går hurtigt — men risikoen for at tabe muskler stiger. Overvej et roligere tempo.</p>` : ''}
     ${m.begraenset ? `<p class="advarsel">Tempoet er automatisk skruet ned, så underskuddet holder sig under 25 % af dit forbrug.</p>` : ''}
+    ${t.profil.maalvaegt >= t.profil.vaegt ? `<p class="advarsel">Din målvægt er ikke lavere end din nuværende vægt. Appen regner stadig et underskud ud, men den kan ikke sige, hvor lang tid der går.</p>` : ''}
     <p class="finprint">Beregnet med Mifflin-St Jeor plus dit aktivitetsniveau og ${t.profil.traening} Bodypump-timer. Det er et kvalificeret estimat — justér efter, hvad vægten og taljen faktisk gør over 3-4 uger.</p>
   </div>`;
 }
@@ -212,6 +218,12 @@ export function bind(rod) {
     el.addEventListener('input', () => {
       const vaerdi = el.type === 'number' ? Number(el.value) : (isNaN(Number(el.value)) ? el.value : Number(el.value));
       if (el.type === 'number' && (el.value === '' || !Number.isFinite(vaerdi))) return;
+      const g = GRAENSER[navn];
+      if (g && (vaerdi < g[0] || vaerdi > g[1])) {
+        el.setAttribute('aria-invalid', 'true');
+        return;                                    // gem ikke tal, der ikke kan passe
+      }
+      el.removeAttribute('aria-invalid');
       opdater(t => { t.profil[navn] = vaerdi; }, { stille: true });
       const boks = rod.querySelector('#maal-boks');
       if (boks) boks.innerHTML = maalBoks();

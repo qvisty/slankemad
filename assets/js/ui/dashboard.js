@@ -50,6 +50,7 @@ export function html() {
         <p class="finprint">${tal(maal.protein)} g protein · ${tal(maal.underskud)} kcal under dit forbrug · ca. ${tal(maal.ugetab, 2)} kg om ugen</p>
       </div>
       <button class="knap bred" data-handling="lav-plan">Lav min madplan</button>
+      <button class="knap tekst" data-handling="gaa-mig">Tallene er et udgangspunkt — ret dem til dig</button>
     </div>
 
     <section class="blok">
