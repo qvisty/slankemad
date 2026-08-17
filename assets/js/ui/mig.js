@@ -73,6 +73,15 @@ export function html() {
           <select data-valg="dage">${[3, 4, 5, 6, 7].map(n => `<option value="${n}" ${v.dage == n ? 'selected' : ''}>${n} dage</option>`).join('')}</select>
         </label>
       </div>
+      <div>
+        <p class="label" style="margin-bottom:4px">Hvornår spiser du?</p>
+        <p class="finprint" style="margin-bottom:8px">Bruges til at lægge snacken i dagens længste hul i stedet for lige før et måltid.</p>
+        <div class="felt-par">
+          <label class="felt"><span>Morgenmad</span><input type="time" data-tid="morgenmad" value="${v.tider.morgenmad}"></label>
+          <label class="felt"><span>Frokost</span><input type="time" data-tid="frokost" value="${v.tider.frokost}"></label>
+        </div>
+        <label class="felt" style="margin-top:12px"><span>Aftensmad</span><input type="time" data-tid="aftensmad" value="${v.tider.aftensmad}"></label>
+      </div>
       <label class="felt"><span>Højst tid pr. ret på hverdage</span>
         <select data-valg="maxTid">
           <option value="15" ${v.maxTid == 15 ? 'selected' : ''}>15 minutter</option>
@@ -246,6 +255,11 @@ export function bind(rod) {
       if (kraeverGentegning) tegn();
     });
   });
+
+  rod.querySelectorAll('[data-tid]').forEach(el => el.addEventListener('change', () => {
+    if (!el.value) return;
+    opdater(t => { t.valg.tider = { ...t.valg.tider, [el.dataset.tid]: el.value }; }, { stille: true });
+  }));
 
   rod.querySelectorAll('[data-undgaa]').forEach(el => el.addEventListener('change', () => {
     const m = el.dataset.undgaa;

@@ -31,6 +31,7 @@ export const STANDARD = Object.freeze({
     snacks: 1,
     maxTid: 30,
     undgaa: [],
+    tider: { morgenmad: '08:00', frokost: '12:15', aftensmad: '18:00' },
     rester: true,
     udeMorgenmad: false,   // morgenmad i hverdagen spises ude (kantine/buffet)
     udeFrokost: false,     // frokost i hverdagen spises ude
@@ -64,7 +65,11 @@ function flet(standard, gemt) {
   return {
     version: 2,
     profil: { ...standard.profil, ...(gemt.profil || {}) },
-    valg: { ...standard.valg, ...(gemt.valg || {}) },
+    valg: {
+      ...standard.valg,
+      ...(gemt.valg || {}),
+      tider: { ...standard.valg.tider, ...((gemt.valg || {}).tider || {}) }
+    },
     favoritter: Array.isArray(gemt.favoritter) ? gemt.favoritter : [],
     fravalgte: Array.isArray(gemt.fravalgte) ? gemt.fravalgte : [],
     plan: gemt.plan || null,

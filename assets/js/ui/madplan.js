@@ -8,6 +8,7 @@ import { dagensTal, regenererDag, bytRet, skiftFleks, lavPlan, slotFaktor } from
 import { madSvg } from './billede.js';
 import { visOpskrift, kategoriNavn } from './opskriftsark.js';
 import { tal, esc, minutter, toast } from './format.js';
+import { tiderFor, formiddagsvurdering, varighed } from '../core/rytme.js';
 import { tegn, gaaTil } from './bus.js';
 
 let valgtDag = 0;
@@ -68,8 +69,19 @@ export function html() {
   </div>
 
   <div class="maaltider">
-    ${dag.slots.map((s, j) => slotKort(s, valgtDag, j, dag)).join('')}
+    ${(() => {
+      // Vis dagen i den rækkefølge, du spiser den — en snack kl. 15 hører til
+      // før aftensmaden, ikke efter.
+      const tider = tiderFor(dag.slots.map(s => s.slot), t.valg);
+      return dag.slots
+        .map((s, j) => ({ s, j, tid: tider[j]?.tid }))
+        .sort((a, b) => (a.tid || '99').localeCompare(b.tid || '99'))
+        .map(x => slotKort(x.s, valgtDag, x.j, dag, x.tid))
+        .join('');
+    })()}
   </div>
+
+  ${rytmeNote(t.valg)}
 
   <div class="knap-gruppe" style="margin-top:4px">
     <button class="knap sek lille" data-handling="ny-dag">↻ Ny ${esc(dag.navn.toLowerCase())}</button>
@@ -96,11 +108,25 @@ export function html() {
   </section>` : ''}`;
 }
 
-function slotKort(s, dagIndex, slotIndex, dag) {
+/** Et par linjer om, hvordan dagens huller ligger — og hvad man gør ved dem. */
+function rytmeNote(valg) {
+  const r = formiddagsvurdering(valg);
+  if (!r) return '';
+  const hul = r.stoersteHul === 'eftermiddag' ? 'mellem frokost og aftensmad' : 'mellem morgenmad og frokost';
+  return `<div class="kort" style="display:grid;gap:6px">
+    <p class="label">Din dagsrytme</p>
+    <p style="font-size:14px">Der er <strong>${varighed(r.formiddag)}</strong> fra morgenmad til frokost${r.eftermiddag ? ` og <strong>${varighed(r.eftermiddag)}</strong> fra frokost til aftensmad` : ''}.</p>
+    <p class="finprint">${r.behoverFormiddagsmad
+      ? `Et mellemmåltid gør reel gavn på formiddagen. Snacken er lagt omkring kl. ${r.snackTid}.`
+      : `Formiddagen er kort nok til, at et mellemmåltid mest er vane, hvis morgenmaden var stor nok. Det længste hul ligger ${hul} — snacken er lagt omkring kl. ${r.snackTid}.`}</p>
+  </div>`;
+}
+
+function slotKort(s, dagIndex, slotIndex, dag, tidspunkt) {
   if (s.fleks) {
     return `<div class="maaltid fleks">
       <div class="krop">
-        <span class="slot">${kategoriNavn(s.slot)} · fri aften</span>
+        <span class="slot">${kategoriNavn(s.slot)}${tidspunkt ? ` · kl. ${tidspunkt}` : ''} · fri aften</span>
         <h4>Spis det, I har lyst til 🍕</h4>
         <p class="finprint" style="margin-top:4px">Sigt efter omkring <strong>${tal(s.budget)} kcal</strong> og få lidt protein med. En planlagt fri aften er grunden til, at resten af ugen holder.</p>
         <div class="knap-gruppe" style="margin-top:10px">
@@ -118,7 +144,7 @@ function slotKort(s, dagIndex, slotIndex, dag) {
     <button class="maaltid" data-ret="${o.id}" data-faktor="${f}">
       <div class="billede">${madSvg(o, { b: 200, h: 200 })}</div>
       <div class="krop">
-        <span class="slot">${kategoriNavn(s.slot)}${o.ude ? ` · ${esc(o.sted || 'ude')}` : (s.rester ? ' · rester fra i går' : '')}</span>
+        <span class="slot">${tidspunkt ? `kl. ${tidspunkt} · ` : ''}${kategoriNavn(s.slot)}${o.ude ? ` · ${esc(o.sted || 'ude')}` : (s.rester ? ' · rester fra i går' : '')}</span>
         <h4>${esc(o.navn)}${erFavorit(o.id) ? ' <span class="hjerte">♥</span>' : ''}</h4>
         <p class="meta"><span class="tal">${tal(m.kcal * f)} kcal</span><span class="tal">${tal(m.p * f)} g protein</span>${o.ude ? '' : `<span>${o.tid} min</span>`}</p>
       </div>
