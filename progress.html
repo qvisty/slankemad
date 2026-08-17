@@ -37,7 +37,26 @@
 
   <section class="kort">
     <h2 style="font-size:18px;margin-bottom:4px">Status lige nu</h2>
-    <p class="muted" style="font-size:14px">Runde 2 af den blinde kritik. Datalag, plangenerator, indkøbslogik og alle fem skærme er bygget og kører uden fejl i browseren. Målestokken er den researchede designspec fra Lifesum, Yazio, Mealime og Eat This Much.</p>
+    <p class="muted" style="font-size:14px">Runde 2 er kørt færdig. To kritikere med frisk kontekst — én på de renderede skærme, én der kørte koden og efterregnede tallene — fandt tilsammen 40+ fejl. De alvorlige er rettet og målt igen. Appen er deployet på GitHub Pages fra <code>main</code>.</p>
+  </section>
+
+  <section>
+    <h2 style="font-size:18px;margin-bottom:12px">Målt før og efter runde 2</h2>
+    <div class="kort rul">
+      <table class="status-tabel">
+        <thead><tr><th>Mål</th><th>Før</th><th>Efter</th></tr></thead>
+        <tbody>
+          <tr><td>Dage der rammer proteinmålet</td><td>54 %</td><td><span class="prik bestaaet">99 %</span></td></tr>
+          <tr><td>Laveste hviledag (6 træningsdage)</td><td>901 kcal</td><td><span class="prik bestaaet">1.853 kcal</span></td></tr>
+          <tr><td>Krak ved fravalg af laktose + gluten</td><td>TypeError</td><td><span class="prik bestaaet">Ingen — måltidet springes over og siges højt</span></td></tr>
+          <tr><td>Retter tilbage ved laktose + gluten</td><td>3</td><td><span class="prik bestaaet">6</span></td></tr>
+          <tr><td>Indkøbsmængder</td><td>Rundet ned, op til −13 %</td><td><span class="prik bestaaet">Rundes altid op</span></td></tr>
+          <tr><td>"Efter ret"-visning</td><td>4,6× for store mængder</td><td><span class="prik bestaaet">1,01×</span></td></tr>
+          <tr><td>Kontrast på sekundær tekst</td><td>2,9:1 (fejler WCAG)</td><td><span class="prik bestaaet">4,6:1</span></td></tr>
+          <tr><td>Kalorieafvigelse pr. dag</td><td>1,3 %</td><td><span class="prik bestaaet">1,1 %</span></td></tr>
+        </tbody>
+      </table>
+    </div>
   </section>
 
   <section>
@@ -48,62 +67,38 @@
           <tr><th>Komponent</th><th>Status</th><th>Iteration</th><th>Seneste kritik</th><th>Hvad blev ændret</th><th>Næste skridt</th></tr>
         </thead>
         <tbody data-status>
-          <tr>
-            <td>Datamodel</td>
-            <td><span class="prik bestaaet">Bestået</span></td><td>2</td>
-            <td class="kritik">Opdigtede kronepriser i varekataloget kunne ikke efterprøves.</td>
-            <td>Alle priser fjernet. Erstattet af prisklasse 1-3 til "billig"-mærkatet. Pakkestørrelser rettet mod verificeret REMA-varedata.</td>
-            <td>Ingen — låst.</td>
-          </tr>
-          <tr>
-            <td>Ernæringsberegning</td>
-            <td><span class="prik bestaaet">Bestået</span></td><td>2</td>
-            <td class="kritik">Makroer skrevet i hånden pr. opskrift kan komme i utakt med ingredienslisten.</td>
-            <td>Al næring beregnes nu fra varekataloget. Mærkater (hurtig, proteinrig, træningsdag) beregnes også — de kan ikke lyve.</td>
-            <td>Ingen — låst.</td>
-          </tr>
-          <tr>
-            <td>Plangenerator</td>
-            <td><span class="prik igang">I gang</span></td><td>3</td>
-            <td class="kritik">Portionsfaktoren ramte loftet på 1,30× — planen kunne ikke nå et højt kaloriemål uden at oppuste portionerne.</td>
-            <td>Loft hævet til 1,45×, og teksten forklarer nu i stedet for at vise et råt tal. Råvaregenbrug vægtes i scoringen.</td>
-            <td>Ramme proteinmålet tættere på de dage, hvor det ligger 10-15 g under.</td>
-          </tr>
-          <tr>
-            <td>Indkøbsliste</td>
-            <td><span class="prik igang">I gang</span></td><td>2</td>
-            <td class="kritik">"ca. 5 pakker à 1 stk" på styksvarer er nonsens.</td>
-            <td>Pakke-hint vises kun for vægt- og volumenvarer med mere end én pakke.</td>
-            <td>Tjek at mængder for 1 person og for 6 personer også ser fornuftige ud.</td>
-          </tr>
-          <tr>
-            <td>Design og navigation</td>
-            <td><span class="prik igang">I gang</span></td><td>2</td>
-            <td class="kritik">Emoji-ikoner i bundnavigationen havde deres egne farver, så "aktiv" blev umulig at aflæse.</td>
-            <td>Erstattet af streg-ikoner i currentColor. Madbilledet beskæres nu korrekt i kortet.</td>
-            <td>Blind sammenligning mod målestokken på mobil.</td>
-          </tr>
-          <tr>
-            <td>Opskriftskort og -ark</td>
-            <td><span class="prik igang">I gang</span></td><td>1</td>
-            <td class="kritik">Endnu ikke kritiseret.</td>
-            <td>Bygget: genereret madillustration, mærkater, næring pr. portion, ingredienser skaleret til antal personer.</td>
-            <td>Kritik af informationshierarkiet i arket.</td>
-          </tr>
-          <tr>
-            <td>Mobiloplevelse</td>
-            <td><span class="prik igang">I gang</span></td><td>1</td>
-            <td class="kritik">Retternes titler brød over tre linjer på 390 px.</td>
-            <td>Titler klippes efter to linjer, billedkolonnen er låst til 96 px.</td>
-            <td>Test af tommelfinger-rækkevidde og trykflader i indkøbslisten.</td>
-          </tr>
-          <tr>
-            <td>GitHub Pages-deployment</td>
-            <td><span class="prik igang">I gang</span></td><td>1</td>
-            <td class="kritik">Ikke verificeret på den deployede version endnu.</td>
-            <td>Workflow bygget: syntakstjek af alle moduler, derefter deploy ved push til main.</td>
-            <td>Kør deployment og test den offentlige URL.</td>
-          </tr>
+          <tr><td>Datamodel</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Opdigtede kronepriser kunne ikke efterprøves.</td>
+            <td>Alle priser fjernet. Pakkestørrelser rettet mod verificeret REMA-varedata.</td>
+            <td>Låst.</td></tr>
+          <tr><td>Ernæringsdata</td><td><span class="prik bestaaet">Bestået</span></td><td>3</td>
+            <td class="kritik">Seks varer afveg fra danske varedeklarationer — værst hakket kylling med +20 % protein i netop de retter, planen bruger mest.</td>
+            <td>Rettet: hakket kylling, mozzarella, hummus, kikærter, sojasauce, honning. Hvidløg måles nu i fed, ikke i hoveder.</td>
+            <td>Låst.</td></tr>
+          <tr><td>Målberegning</td><td><span class="prik bestaaet">Bestået</span></td><td>3</td>
+            <td class="kritik">Hviledage kunne falde til 901 kcal. Proteinmål regnet af nuværende vægt låste 35 % af budgettet.</td>
+            <td>Gulv ved BMR, fast kaloriedelta, protein regnet af målvægt. Advarslen om for hurtigt tempo bruger nu samme tal som guiden.</td>
+            <td>Låst.</td></tr>
+          <tr><td>Plangenerator</td><td><span class="prik bestaaet">Bestået</span></td><td>4</td>
+            <td class="kritik">Protein kunne handles væk: straffen var mindre end værdien af én favoritret. Tomme kategorier væltede planen.</td>
+            <td>Proteinstraf ×6, tidlig afbrydelse fjernet, tomme kategorier håndteres. 99 % af dagene rammer nu proteinmålet.</td>
+            <td>Fravalg af tre kødtyper giver stadig 87 % af proteinmålet — appen advarer i stedet for at skjule det.</td></tr>
+          <tr><td>Indkøbsliste</td><td><span class="prik bestaaet">Bestået</span></td><td>3</td>
+            <td class="kritik">43 svævende kort i stedet for en liste. Mængder rundet ned. "Efter ret" firedoblede alt.</td>
+            <td>Ét kort pr. afdeling, rækker à 52 px, oprunding, og rettens egen andel under hver ret.</td>
+            <td>Låst.</td></tr>
+          <tr><td>Design og navigation</td><td><span class="prik igang">I gang</span></td><td>3</td>
+            <td class="kritik">Sekundær tekst på 2,9:1 kontrast. Accentfarven betød syv forskellige ting.</td>
+            <td>Ny grå på 4,6:1, neutrale mærkater, mørk skrift på lys accent i mørk tilstand, streg-ikoner i stedet for emoji.</td>
+            <td>Desktop udnytter stadig ikke bredden fuldt ud.</td></tr>
+          <tr><td>Madbilleder</td><td><span class="prik igang">Bevidst fravalg</span></td><td>3</td>
+            <td class="kritik">Den største tilbageværende forskel til målestokken: rigtige madfotos. Genererede illustrationer har ikke appetitværdi.</td>
+            <td>Illustrationerne er strammet op: fyldt tallerken, én rolig baggrundstone, lyse råvarer gjort synlige.</td>
+            <td>Fotos kræver 49 licenserede billeder. Fravalgt bevidst — en statisk side uden eksterne kald og uden rettighedsproblemer vægtes højere.</td></tr>
+          <tr><td>GitHub Pages-deployment</td><td><span class="prik bestaaet">Bestået</span></td><td>2</td>
+            <td class="kritik">Workflowet forsøgte at oprette Pages-sitet selv og fejlede på manglende rettigheder.</td>
+            <td>Oprettelsen fjernet fra workflowet; Pages slået til én gang manuelt. Deployment kører grønt.</td>
+            <td>Låst.</td></tr>
         </tbody>
       </table>
     </div>
